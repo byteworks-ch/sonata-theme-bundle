@@ -1,0 +1,28 @@
+{#
+    Brand of the sidebar: logo and text. Logo variants (option brand.logo): "light" and "dark" for the background
+    of the sidebar, "mini_light" and "mini_dark" for the collapsed sidebar; a missing variant falls back to the
+    corresponding light one, then to the full logo, then to sonata_admin.title_logo. Variants that differ are all
+    rendered; CSS shows the one for the current color mode and sidebar state.
+#}
+{% set _logo_content = sonata_config.getOption('logo_content') %}
+{% set _text = adminlte4.brand.text ?? sonata_config.title %}
+{% set _light = adminlte4.brand.logo.light ?? sonata_config.logo %}
+{% set _dark = adminlte4.brand.logo.dark ?? _light %}
+{% set _mini_light = adminlte4.brand.logo.mini_light ?? _light %}
+{% set _mini_dark = adminlte4.brand.logo.mini_dark ?? adminlte4.brand.logo.mini_light ?? _dark %}
+<a href="{{ adminlte4.brand.url ?? path('sonata_admin_dashboard') }}" class="brand-link">
+    {% if _logo_content in ['icon', 'all'] %}
+        {% for size, variants in {full: {light: _light, dark: _dark}, mini: {light: _mini_light, dark: _mini_dark}} %}
+            {% if variants.light == variants.dark %}
+                <img src="{{ asset(variants.light) }}" alt="{{ _text }}" class="brand-image adminlte4-logo adminlte4-logo-{{ size }}">
+            {% else %}
+                {% for variant, src in variants %}
+                    <img src="{{ asset(src) }}" alt="{{ _text }}" class="brand-image adminlte4-logo adminlte4-logo-{{ size }} adminlte4-logo-{{ variant }}">
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+    {% if _logo_content in ['text', 'all'] %}
+        <span class="brand-text fw-light">{{ _text }}</span>
+    {% endif %}
+</a>

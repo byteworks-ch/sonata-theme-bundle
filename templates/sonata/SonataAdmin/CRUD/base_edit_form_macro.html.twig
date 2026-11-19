@@ -1,0 +1,49 @@
+{#
+    Groups of the edit form as cards in a grid row; the fields of a group form a grid row as well, so a field with
+    a column class (row_attr {class: 'col-md-6'}) sits next to the following one. Sonata's box_class values
+    ("box box-primary") are mapped to card classes.
+#}
+{% macro render_groups(admin, form, groups, has_tab) %}
+    <div class="row">
+    {% for code in groups|filter(code => admin.formgroups[code] is defined) %}
+        {% set form_group = admin.formgroups[code] %}
+        <div class="{{ form_group.class|default('col-12') }}">
+            <div class="{{ form_group.box_class|adminlte4_card_class }} mb-3">
+                <div class="card-header">
+                    <h4 class="card-title">
+                        {% if form_group.translation_domain is defined and form_group.translation_domain is same as(false) %}
+                            {{ form_group.label }}
+                        {% else %}
+                            {{ form_group.label|trans({}, form_group.translation_domain ?? admin.translationDomain) }}
+                        {% endif %}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    {% if form_group.description %}
+                        {% if form_group.translation_domain is defined and form_group.translation_domain is same as(false) %}
+                            <p class="text-body-secondary">{{ form_group.description|raw }}</p>
+                        {% else %}
+                            <p class="text-body-secondary">{{ form_group.description|trans({}, form_group.translation_domain ?? admin.translationDomain)|raw }}</p>
+                        {% endif %}
+                    {% endif %}
+                    <div class="sonata-ba-collapsed-fields row">
+                        {% for form_field_name in form_group.fields|filter(form_field_name => form[form_field_name] is defined) %}
+                            {{ form_row(form[form_field_name]) }}
+                        {% else %}
+                            {% if form_group.empty_message != false %}
+                                <div class="col-12">
+                                    {% if form_group.empty_message_translation_domain is defined and form_group.empty_message_translation_domain is same as(false) %}
+                                        <em>{{ form_group.empty_message }}</em>
+                                    {% else %}
+                                        <em>{{ form_group.empty_message|trans({}, form_group.empty_message_translation_domain ?? admin.translationDomain) }}</em>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+{% endmacro %}

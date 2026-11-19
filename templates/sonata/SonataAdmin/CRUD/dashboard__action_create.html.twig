@@ -1,0 +1,27 @@
+{% if admin.subClasses is empty %}
+    {{ include('@SonataAdmin/CRUD/dashboard__action.html.twig') }}
+{% else %}
+    <div class="btn-group btn-group-sm">
+        <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            {{ action.icon|parse_icon }}
+            {% if action.translation_domain is defined and action.translation_domain is same as(false) %}
+                {{ action.label }}
+            {% else %}
+                {{ action.label|trans({}, action.translation_domain|default('SonataAdminBundle')) }}
+            {% endif %}
+        </button>
+        <ul class="dropdown-menu">
+            {% for subclass in admin.subclasses|keys %}
+                <li>
+                    <a class="dropdown-item" href="{{ admin.generateUrl('create', {subclass: subclass}) }}">
+                        {% if action.translation_domain is defined and action.translation_domain is same as(false) %}
+                            {{ subclass }}
+                        {% else %}
+                            {{ subclass|trans({}, action.translation_domain|default('SonataAdminBundle')) }}
+                        {% endif %}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}

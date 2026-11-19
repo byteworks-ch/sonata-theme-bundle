@@ -1,0 +1,261 @@
+{#
+    Form theme of the Sonata admin on Bootstrap 5. The ORM bundle's form theme extends this template by name, so it
+    keeps Sonata's name. Symfony's bootstrap_5_layout renders the fields; this theme adds Sonata's parts: the row
+    container with the id "sonata-ba-field-container-<id>" (applications and scripts rely on it), the translation
+    domain of the admin for labels and help texts, the select enhancement and Sonata's own widgets.
+#}
+{% extends 'bootstrap_5_layout.html.twig' %}
+
+{%- block form_help -%}
+    {%- if sonata_admin_translation_domain is defined and translation_domain is null -%}
+        {%- set translation_domain = sonata_admin_translation_domain -%}
+    {%- endif -%}
+    {%- if help is not empty -%}
+        {%- set help_attr = help_attr|merge({class: (help_attr.class|default('') ~ ' sonata-ba-field-help')|trim}) -%}
+    {%- endif -%}
+    {{- parent() -}}
+{%- endblock form_help -%}
+
+{#- labels of admin fields use the translation domain of the field description, then the one of the admin -#}
+{%- block form_label_content -%}
+    {%- set _admin = sonata_admin.admin|default(null) -%}
+    {%- if _admin is not null and translation_domain is not same as(false) -%}
+        {%- set translation_domain = sonata_admin.field_description.translationDomain|default(_admin.translationDomain) -%}
+    {%- endif -%}
+    {{- parent() -}}
+{%- endblock form_label_content -%}
+
+{%- block form_row_render -%}
+    {#- an autocomplete field is compound when multiple, but a single control: a div with a label for its select (Tom
+        Select passes the label on to its input) -#}
+    {%- set _autocomplete = 'sonata_type_model_autocomplete' in block_prefixes -%}
+    {%- set element = compound is defined and compound and not _autocomplete ? 'fieldset' : 'div' -%}
+    {%- set horizontal = sonata_admin.options['form_type']|default('standard') == 'horizontal' -%}
+
+    {#- Bootstrap's default spacing stays when the row has own classes (Sonata adds them as well); a top-level field
+        of the admin form is a column of the group's grid, unless it sets its own column class -#}
+    {%- set row_classes = ['mb-3'] -%}
+    {%- if row_attr.class is defined and row_attr.class is not empty -%}
+        {%- set row_classes = row_classes|merge([row_attr.class]) -%}
+    {%- endif -%}
+    {%- if form.parent is not null and form.parent is rootform and not (row_attr.class|default('') matches '/(^|\\s)col(-|\\s|$)/') -%}
+        {%- set row_classes = row_classes|merge(['col-12']) -%}
+    {%- endif -%}
+    {%- if horizontal -%}
+        {%- set row_classes = row_classes|merge(['row']) -%}
+    {%- endif -%}
+
+    {%- set field_classes = ['sonata-ba-field'] -%}
+    {%- if label is same as(false) -%}
+        {%- set field_classes = field_classes|merge(['sonata-collection-row-without-label']) -%}
+    {%- endif -%}
+    {%- if sonata_admin is defined and sonata_admin_enabled|default(false) -%}
+        {%- set field_classes = field_classes|merge(['sonata-ba-field-' ~ sonata_admin.edit ~ '-' ~ sonata_admin.inline]) -%}
+    {%- endif -%}
+    {%- if errors|length > 0 -%}
+        {%- set field_classes = field_classes|merge(['sonata-ba-field-error']) -%}
+    {%- endif -%}
+    {%- if horizontal -%}
+        {%- set field_classes = field_classes|merge([label is same as(false) or form.vars.checked is defined ? 'col-sm-9 offset-sm-3' : 'col-sm-9']) -%}
+        {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' col-sm-3')|trim}) -%}
+    {%- endif -%}
+
+    <{{ element }}{% with {attr: row_attr|merge({id: 'sonata-ba-field-container-' ~ id, class: row_classes|join(' ')})} %}{{ block('attributes') }}{% endwith %}>
+        {%- if _autocomplete -%}
+            {{- form_label(form, null, {label_attr: label_attr, compound: false, id: id ~ '_autocomplete_input'}) -}}
+        {%- else -%}
+            {{- form_label(form, null, {label_attr: label_attr}) -}}
+        {%- endif -%}
+        <div class="{{ field_classes|join(' ') }}">
+            {{- form_widget(form, widget_attr) -}}
+            {{- form_help(form) -}}
+            {%- if errors|length > 0 -%}
+                <div class="sonata-ba-field-error-messages">
+                    {{- form_errors(form) -}}
+                </div>
+            {%- endif -%}
+        </div>
+    </{{ element }}>
+{%- endblock form_row_render -%}
+
+{#- select boxes: Sonata's placeholder handling, plus the Stimulus controller of the select enhancement (Tom Select)
+    unless it is off (theme option select.enabled, else sonata_admin.options.use_select2) or the field opts out with
+    the attribute data-sonata-select2="false" -#}
+{%- block choice_widget_collapsed -%}
+    {%- if required and placeholder is defined and placeholder is none -%}
+        {%- set required = false -%}
+    {%- endif -%}
+    {%- if sortable is defined and sortable and multiple -%}
+        {{- block('sonata_type_choice_multiple_sortable') -}}
+    {%- else -%}
+    {%- set _enhance = adminlte4.select.enabled ?? (sonata_config is defined and sonata_config.getOption('use_select2')) -%}
+    {%- if _enhance and (attr['data-sonata-select2'] is not defined or attr['data-sonata-select2'] not in [false, 'false']) -%}
+        {%- set attr = attr|merge({'data-controller': (attr['data-controller']|default('') ~ ' sonata-select')|trim}) -%}
+        {%- if placeholder is defined and placeholder is not none -%}
+            {%- set _domain = sonata_admin.admin|default(null) is not null ? sonata_admin.field_description.translationDomain : translation_domain -%}
+            {%- set attr = attr|merge({'data-placeholder': placeholder != '' ? placeholder|trans({}, _domain) : ''}) -%}
+        {%- endif -%}
+    {%- endif -%}
+    {{- parent() -}}
+    {%- endif -%}
+{%- endblock choice_widget_collapsed -%}
+
+{#- Sortable multiple choice (option "sortable"; Sonata used Select2 with jQuery UI): a multiple select with the
+    selected choices first, in the order of the value, then the others; Tom Select orders them by drag and drop
+    (always, also without "use_select2": the order cannot be set otherwise). The browser sends the selected
+    options in their order; the field needs "by_reference" false to keep it, as with Sonata's own widget (Symfony
+    merges the values of a multiple choice into the existing ones otherwise). -#}
+{%- block sonata_type_choice_multiple_sortable -%}
+    {%- set attr = attr|merge({
+        class: ('form-select ' ~ attr.class|default(''))|trim,
+        'data-controller': (attr['data-controller']|default('') ~ ' sonata-select')|trim,
+        'data-sonata-sortable': 'true',
+    }) -%}
+    <select {{ block('widget_attributes') }} multiple="multiple">
+        {%- for choice_value in value -%}
+            {%- for choice in choices|filter(choice => choice.value is defined and choice.value == choice_value) -%}
+                <option value="{{ choice.value }}" selected="selected">{{ choice_translation_domain is same as(false) ? choice.label : choice.label|trans(choice.labelTranslationParameters, choice_translation_domain) }}</option>
+            {%- endfor -%}
+        {%- endfor -%}
+        {%- for choice in choices|filter(choice => choice.value is defined and choice.value not in value) -%}
+            <option value="{{ choice.value }}">{{ choice_translation_domain is same as(false) ? choice.label : choice.label|trans(choice.labelTranslationParameters, choice_translation_domain) }}</option>
+        {%- endfor -%}
+    </select>
+{%- endblock sonata_type_choice_multiple_sortable -%}
+
+{% block sonata_type_native_collection_widget_row %}
+    <div class="sonata-collection-row d-flex align-items-start gap-2" {{ stimulus_target('sonata-collection', 'item') }}>
+        {% if allow_delete %}
+            <button type="button" class="btn btn-link text-danger px-1 sonata-collection-delete" title="{{ 'link_delete'|trans({}, 'SonataAdminBundle') }}"
+                    {{ stimulus_action('sonata-collection', 'delete', 'click') }}>
+                <i class="fas fa-minus-circle" aria-hidden="true"></i>
+                <span class="visually-hidden">{{ 'link_delete'|trans({}, 'SonataAdminBundle') }}</span>
+            </button>
+        {% endif %}
+        <div class="flex-grow-1">
+            {{ form_row(child, {label: false}) }}
+        </div>
+    </div>
+{% endblock sonata_type_native_collection_widget_row %}
+
+{% block sonata_type_native_collection_widget %}
+    {% if prototype is defined %}
+        {% set child = prototype %}
+        {% set allow_delete_backup = allow_delete %}
+        {% set allow_delete = true %}
+        {% set attr = attr|merge({
+            'data-prototype': block('sonata_type_native_collection_widget_row'),
+            'data-prototype-name': prototype.vars.name,
+            class: attr.class|default(''),
+        })|merge(stimulus_controller('sonata-collection').toArray()) %}
+        {% set allow_delete = allow_delete_backup %}
+    {% endif %}
+    {# the add button stays a direct child: the controller inserts new rows right before it #}
+    <div {{ block('widget_container_attributes') }}>
+        {% for child in form %}
+            {{ block('sonata_type_native_collection_widget_row') }}
+        {% endfor %}
+        {{ form_rest(form) }}
+        {% if allow_add %}
+            <button type="button" class="btn btn-sm btn-outline-success sonata-collection-add" title="{{ 'link_add'|trans({}, 'SonataAdminBundle') }}"
+                    {{ stimulus_action('sonata-collection', 'add', 'click') }}>
+                <i class="fas fa-plus-circle" aria-hidden="true"></i>
+                {{ 'link_add'|trans({}, 'SonataAdminBundle') }}
+            </button>
+        {% endif %}
+    </div>
+{% endblock sonata_type_native_collection_widget %}
+
+{% block sonata_type_immutable_array_widget %}
+    <div {{ block('widget_container_attributes') }}>
+        {% for key, child in form %}
+            {{ block('sonata_type_immutable_array_widget_row') }}
+        {% endfor %}
+        {{ form_rest(form) }}
+    </div>
+{% endblock sonata_type_immutable_array_widget %}
+
+{% block sonata_type_immutable_array_widget_row %}
+    <div class="mb-3" id="sonata-ba-field-container-{{ id }}-{{ key }}">
+        {{ form_label(child) }}
+        <div class="sonata-ba-field sonata-ba-field-{{ sonata_admin.edit }}-{{ sonata_admin.inline }}{% if child.vars.errors|length > 0 %} sonata-ba-field-error{% endif %}">
+            {{ form_widget(child) }}
+            {{ form_help(child) }}
+            {% if child.vars.errors|length > 0 %}
+                <div class="sonata-ba-field-error-messages">{{ form_errors(child) }}</div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block sonata_type_model_list_widget %}
+    {% import '@ByteworksSonataTheme/association.html.twig' as association %}
+    {% set association_admin = sonata_admin.field_description.associationadmin %}
+    {% set translation_domain_buttons = btn_translation_domain|default(null) is same as(false) ? false : btn_translation_domain|default(btn_catalogue) %}
+    {% set _association_admin = sonata_admin.field_description.associationadmin %}
+    {% set values = {
+        field: id,
+        mode: 'list',
+        shortUrl: association.short_url(sonata_admin, '__OBJECT_ID__', app) ~ '',
+        editUrl: _association_admin.hasRoute('edit') and _association_admin.hasAccess('edit') ? _association_admin.generateUrl('edit', {(_association_admin.idParameter): '__OBJECT_ID__'}) : '',
+        placeholder: sonata_admin.field_description.option('placeholder', 'short_object_description_placeholder')|trans({}, 'SonataAdminBundle'),
+        loading: 'loading_information'|trans({}, 'SonataAdminBundle'),
+    } %}
+    <div id="field_container_{{ id }}" class="field-container" {{ stimulus_controller('sonata-association', values) }}>
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <span id="field_widget_{{ id }}" class="field-short-description" {{ stimulus_target('sonata-association', 'description') }}>
+                {% if sonata_admin.value and association_admin.urlSafeIdentifier(sonata_admin.value) is not null %}
+                    {{ render(association.short_url(sonata_admin, association_admin.urlSafeIdentifier(sonata_admin.value), app)) }}
+                {% elseif sonata_admin.field_description.option('placeholder', 'short_object_description_placeholder') %}
+                    <span class="inner-field-short-description text-body-secondary">
+                        {{ sonata_admin.field_description.option('placeholder', 'short_object_description_placeholder')|trans({}, 'SonataAdminBundle') }}
+                    </span>
+                {% endif %}
+            </span>
+            <span id="field_actions_{{ id }}" class="field-actions btn-group btn-group-sm">
+                {% if association_admin.hasRoute('list') and association_admin.hasAccess('list') and btn_list %}
+                    {{ association.button(association_admin.generateUrl('list', {select: true}), 'openList', 'fas fa-list', btn_list, translation_domain_buttons) }}
+                {% endif %}
+                {% if association_admin.hasRoute('create') and association_admin.hasAccess('create') and btn_add %}
+                    {{ association.button(association_admin.generateUrl('create'), 'openAdd', 'fas fa-plus-circle', btn_add, translation_domain_buttons) }}
+                {% endif %}
+                {% if association_admin.hasRoute('edit') and association_admin.hasAccess('edit') and btn_edit %}
+                    {{ association.button(sonata_admin.value is null ? '#' : association_admin.generateUrl('edit', {(association_admin.idParameter): association_admin.urlSafeIdentifier(sonata_admin.value)}), 'openEdit', 'fas fa-pencil-alt', btn_edit, translation_domain_buttons, sonata_admin.value is null, 'editButton') }}
+                {% endif %}
+                {% if btn_delete %}
+                    {{ association.button('#', 'remove', 'fas fa-minus-circle', btn_delete, translation_domain_buttons) }}
+                {% endif %}
+            </span>
+        </div>
+        <span class="d-none">
+            {# a hidden input cannot be required: the browser could not focus it to report the error #}
+            {{ form_widget(form, {required: false, attr: {
+                'data-sonata-association-target': 'input',
+                'data-action': 'change->sonata-association#refresh',
+            }}) }}
+        </span>
+    </div>
+{% endblock %}
+
+{% block sonata_type_model_autocomplete_widget %}
+    {% include template %}
+{% endblock sonata_type_model_autocomplete_widget %}
+
+{#- Choice field mask (ChoiceFieldMaskType): shows the fields mapped to the selected choice (Stimulus controller
+    "sonata-choice-field-mask"; Sonata used an inline script). -#}
+{% block sonata_type_choice_field_mask_widget %}
+    {# the name of the form, without the glue character before the field name #}
+    {% set main_form_name = id|slice(0, (id|length - name|length) - 1) %}
+    <div {{ stimulus_controller('sonata-choice-field-mask', {
+        form: main_form_name,
+        allFields: all_fields,
+        map: map,
+        inlineTable: form.parent.vars.sonata_admin.inline|default(null) == 'table',
+    }) }} data-action="change->sonata-choice-field-mask#update">
+        {{ block('choice_widget') }}
+    </div>
+{% endblock sonata_type_choice_field_mask_widget %}
+
+{% block sonata_type_template_widget %}
+    {% include template with parameters only %}
+{% endblock sonata_type_template_widget %}

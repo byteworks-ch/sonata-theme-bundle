@@ -1,0 +1,38 @@
+{#
+    Base of the pages outside the admin (login, two-factor, errors): the assets and the color mode of the backend, without
+    header and sidebar.
+    Blocks: title, meta_tags, stylesheets, javascripts, body_class, body.
+#}
+<!DOCTYPE html>
+<html lang="{{ app.request.locale }}" data-adminlte4-color-mode="{{ adminlte4.color_mode.default }}" data-lte-color-mode="off"
+    {%- if adminlte4.skin.primary %} data-lte-primary="{{ adminlte4.skin.primary }}"{% endif %}>
+    <head>
+        {% block meta_tags %}
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <meta name="color-scheme" content="light dark">
+            <meta name="robots" content="noindex, nofollow">
+        {% endblock %}
+
+        <title>{% block title %}{{ adminlte4.brand.text ?? sonata_config.title }}{% endblock %}</title>
+
+        {# before the first paint: the color mode (a dark page does not flash white) and the held sidebar #}
+        <script src="{{ asset('bundles/byteworkssonatatheme/head.js', 'sonata_admin') }}"></script>
+
+        {% block stylesheets %}
+            {% for stylesheet in sonata_config.getOption('stylesheets', []) %}
+                <link rel="stylesheet" href="{{ asset(stylesheet.path, stylesheet.package_name) }}">
+            {% endfor %}
+            {{- include('@ByteworksSonataTheme/skin_colors.html.twig') }}
+        {% endblock %}
+
+        {% block javascripts %}
+            {% for javascript in sonata_config.getOption('javascripts', []) %}
+                <script src="{{ asset(javascript.path, javascript.package_name) }}" defer></script>
+            {% endfor %}
+        {% endblock %}
+    </head>
+    <body class="{% block body_class %}bg-body-tertiary{% endblock %}">
+        {% block body %}{% endblock %}
+    </body>
+</html>

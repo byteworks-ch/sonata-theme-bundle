@@ -1,0 +1,26 @@
+{% set pager = admin.datagrid.pager %}
+<ul class="pagination pagination-sm justify-content-center mb-0">
+    {% if pager.page > 2 %}
+        <li class="page-item"><a class="page-link" href="{{ admin.generateUrl(action, admin.datagrid.paginationparameters(1)) }}" title="{{ 'link_first_pager'|trans({}, 'SonataAdminBundle') }}">&laquo;</a></li>
+    {% endif %}
+
+    {% if pager.page != pager.previouspage %}
+        <li class="page-item"><a class="page-link" href="{{ admin.generateUrl(action, admin.datagrid.paginationparameters(pager.previouspage)) }}" title="{{ 'link_previous_pager'|trans({}, 'SonataAdminBundle') }}">&lsaquo;</a></li>
+    {% endif %}
+
+    {% for page in pager.getLinks(sonata_config.getOption('pager_links')) %}
+        {% if page == pager.page %}
+            <li class="page-item active" aria-current="page"><a class="page-link" href="{{ admin.generateUrl(action, admin.datagrid.paginationparameters(page)) }}">{{ page }}</a></li>
+        {% else %}
+            <li class="page-item"><a class="page-link" href="{{ admin.generateUrl(action, admin.datagrid.paginationparameters(page)) }}">{{ page }}</a></li>
+        {% endif %}
+    {% endfor %}
+
+    {% if pager.page != pager.nextpage %}
+        <li class="page-item"><a class="page-link" href="{{ admin.generateUrl(action, admin.datagrid.paginationparameters(pager.nextpage)) }}" title="{{ 'link_next_pager'|trans({}, 'SonataAdminBundle') }}">&rsaquo;</a></li>
+    {% endif %}
+
+    {% if pager.page != pager.lastpage and pager.lastpage != pager.nextpage %}
+        <li class="page-item"><a class="page-link" href="{{ admin.generateUrl(action, admin.datagrid.paginationparameters(pager.lastpage)) }}" title="{{ 'link_last_pager'|trans({}, 'SonataAdminBundle') }}">&raquo;</a></li>
+    {% endif %}
+</ul>

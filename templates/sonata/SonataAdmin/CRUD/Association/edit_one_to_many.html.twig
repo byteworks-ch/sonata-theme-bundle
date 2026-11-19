@@ -1,0 +1,49 @@
+{#
+    One-to-many association: inline (table or tabs) with a "add" button that appends an item (Stimulus controller
+    "sonata-association", action "append"), sortable with the option "sortable" (controller "sonata-sortable"), or a
+    select with a button that creates a new object in a modal.
+#}
+{% import '@ByteworksSonataTheme/association.html.twig' as association %}
+{% if not sonata_admin.field_description.hasassociationadmin %}
+    {% for element in value %}
+        {{ element|render_relation_element(sonata_admin.field_description) }}
+    {% endfor %}
+{% else %}
+    {% set association_admin = sonata_admin.field_description.associationadmin %}
+    {% set display_create_button = association_admin.hasRoute('create')
+        and association_admin.hasAccess('create')
+        and btn_add
+        and (sonata_admin.field_description.option('limit') is null or form.children|length < sonata_admin.field_description.option('limit')) %}
+    {% set translation_domain_buttons = btn_translation_domain|default(null) is same as(false) ? false : btn_translation_domain|default(btn_catalogue) %}
+    {% set values = sonata_admin.edit == 'inline'
+        ? {field: id, mode: 'inline', appendUrl: association.append_url(sonata_admin, id, app) ~ ''}
+        : {field: id, mode: 'model', retrieveUrl: association.retrieve_url(sonata_admin, id, app) ~ ''} %}
+    <div id="field_container_{{ id }}" class="field-container" {{ stimulus_controller('sonata-association', values) }}>
+        {% set _sortable = sonata_admin.edit == 'inline' ? sonata_admin.field_description.option('sortable', false) : false %}
+        <div id="field_widget_{{ id }}"{% if _sortable %} {{ stimulus_controller('sonata-sortable', {field: id, position: _sortable}) }}{% endif %}>
+            {% if sonata_admin.edit == 'inline' %}
+                {% if sonata_admin.inline == 'table' %}
+                    {% if form.children|length > 0 %}
+                        {% include '@SonataAdmin/CRUD/Association/edit_one_to_many_inline_table.html.twig' %}
+                    {% endif %}
+                {% elseif form.children|length > 0 %}
+                    {% set associationAdmin = association_admin %}
+                    {% include '@SonataAdmin/CRUD/Association/edit_one_to_many_inline_tabs.html.twig' %}
+                {% endif %}
+            {% else %}
+                {{ form_widget(form) }}
+            {% endif %}
+        </div>
+        {% if display_create_button %}
+            <div id="field_actions_{{ id }}" class="field-actions mt-1">
+                {% set text = translation_domain_buttons is same as(false) ? btn_add : btn_add|trans({}, translation_domain_buttons) %}
+                <a href="{{ association_admin.generateUrl('create', sonata_admin.field_description.getOption('link_parameters', {})) }}"
+                   class="btn btn-sm btn-outline-success sonata-ba-action" title="{{ text }}"
+                   data-action="sonata-association#{{ sonata_admin.edit == 'inline' ? 'append' : 'openAdd' }}">
+                    <i class="fas fa-plus-circle" aria-hidden="true"></i>
+                    {{ text }}
+                </a>
+            </div>
+        {% endif %}
+    </div>
+{% endif %}

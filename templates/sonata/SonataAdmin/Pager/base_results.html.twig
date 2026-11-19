@@ -1,0 +1,34 @@
+<span class="text-body-secondary small">
+    {% block num_pages %}
+        {{ admin.datagrid.pager.page }} / {{ admin.datagrid.pager.lastpage }}
+        &nbsp;-&nbsp;
+    {% endblock %}
+
+    {% block num_results %}
+        {% trans with {'%count%': admin.datagrid.pager.countResults()} from 'SonataAdminBundle' %}list_results_count{% endtrans %}
+    {% endblock %}
+</span>
+
+{#- entries per page: a menu like "export" and the batch action; each entry is the list with that page size -#}
+{% block max_per_page %}
+    {% set _label = 'label_per_page'|trans({}, 'SonataAdminBundle') %}
+    <div class="dropdown">
+        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle per-page" data-bs-toggle="dropdown" aria-expanded="false" title="{{ _label }}">
+            {{ admin.datagrid.pager.maxperpage }}
+            <span class="visually-hidden">{{ _label }}</span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+            {% for per_page in admin.getperpageoptions %}
+                {% set _current = per_page == admin.datagrid.pager.maxperpage %}
+                <li>
+                    <a class="dropdown-item{% if _current %} active{% endif %}"{% if _current %} aria-current="true"{% endif %}
+                       href="{{ admin.generateUrl(action, {filter: admin.datagrid.getPaginationParameters(1).filter|merge({
+                           (constant('Sonata\\AdminBundle\\Datagrid\\DatagridInterface::PER_PAGE')): per_page})
+                       }) }}">
+                        {{- per_page -}}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

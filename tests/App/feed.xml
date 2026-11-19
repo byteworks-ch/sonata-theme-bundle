@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+    <channel>
+        <title>Project news</title>
+        <link>https://example.org/</link>
+        <description>News of the example project.</description>
+        <item>
+            <title>Release 1.0</title>
+            <link>https://example.org/news/release-1-0</link>
+            <description>The first stable release.</description>
+        </item>
+        <item>
+            <title>Dark mode</title>
+            <link>https://example.org/news/dark-mode</link>
+            <description>The admin follows the color scheme of the system.</description>
+        </item>
+        <item>
+            <title>New documentation</title>
+            <link>https://example.org/news/documentation</link>
+            <description>Everything about the theme options.</description>
+        </item>
+    </channel>
+</rss>

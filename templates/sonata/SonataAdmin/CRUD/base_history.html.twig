@@ -1,0 +1,54 @@
+{#
+    History of an object (audit): the revisions in a table; "view" and "compare" load the revision into the area next
+    to it (Stimulus controller "sonata-revision", taken over from Sonata). The current revision is highlighted.
+#}
+{% extends base_template %}
+
+{%- block actions -%}
+    {% include '@SonataAdmin/CRUD/action_buttons.html.twig' %}
+{%- endblock -%}
+
+{% block content %}
+    <div class="row g-3" {{ stimulus_controller('sonata-revision') }}>
+        <div class="col-lg-5">
+            <div class="card card-outline card-primary">
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover align-middle mb-0" id="revisions">
+                        <thead>
+                            <tr>
+                                <th>{{ 'td_revision'|trans({}, 'SonataAdminBundle') }}</th>
+                                <th>{{ 'td_timestamp'|trans({}, 'SonataAdminBundle') }}</th>
+                                <th>{{ 'td_username'|trans({}, 'SonataAdminBundle') }}</th>
+                                <th>{{ 'td_action'|trans({}, 'SonataAdminBundle') }}</th>
+                                <th>{{ 'td_compare'|trans({}, 'SonataAdminBundle') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for revision in revisions %}
+                                {% set _current = currentRevision != false and revision.rev == currentRevision.rev %}
+                                <tr class="{% if _current %}current-revision table-active{% endif %}"{% if _current %} aria-current="true"{% endif %}>
+                                    <td>{{ revision.rev }}</td>
+                                    <td>{% include get_admin_template('history_revision_timestamp', admin.code) %}</td>
+                                    <td>{{ revision.username|default('label_unknown_user'|trans({}, 'SonataAdminBundle')) }}</td>
+                                    <td>
+                                        <a href="{{ admin.generateObjectUrl('history_view_revision', object, {'revision': revision.rev}) }}" class="revision-link" rel="{{ revision.rev }}"
+                                           {{ stimulus_action('sonata-revision', 'showPreview:prevent:stop', 'click') }}>{{ 'label_view_revision'|trans({}, 'SonataAdminBundle') }}</a>
+                                    </td>
+                                    <td>
+                                        {% if currentRevision == false or revision.rev == currentRevision.rev %}
+                                            <span class="text-body-secondary">/</span>
+                                        {% else %}
+                                            <a href="{{ admin.generateObjectUrl('history_compare_revisions', object, {'baseRevision': currentRevision.rev, 'compareRevision': revision.rev}) }}" class="revision-compare-link" rel="{{ revision.rev }}"
+                                               {{ stimulus_action('sonata-revision', 'showPreview:prevent:stop', 'click') }}>{{ 'label_compare_revision'|trans({}, 'SonataAdminBundle') }}</a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div id="revision-detail" class="col-lg-7 revision-detail" {{ stimulus_target('sonata-revision', 'preview') }}></div>
+    </div>
+{% endblock %}

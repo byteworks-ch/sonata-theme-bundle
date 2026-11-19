@@ -1,0 +1,77 @@
+{#
+    Sidebar menu (knp_menu_template) as an AdminLTE 4 treeview: li.nav-item > a.nav-link (active for the current
+    item and its ancestors) with i.nav-icon and the label in a <p>; branches get ul.nav.nav-treeview and are open
+    (menu-open) when they contain the current item and the user did not close them, keep_open is set or the user left
+    them open (cookies "sonata_sidebar_open" and "sonata_sidebar_closed", written by the Stimulus controller
+    "adminlte4-sidebar-menu"). Unlike Sonata's template, it does not modify the menu items.
+#}
+{% extends 'knp_menu.html.twig' %}
+
+{% block root %}
+    {%- set listAttributes = item.childrenAttributes|merge({class: 'nav sidebar-menu flex-column', 'data-lte-toggle': 'treeview', 'data-accordion': 'false'}) -%}
+    {%- set request = item.extra('request') ?: app.request -%}
+    {%- set open_groups = app.request.cookies.get('sonata_sidebar_open', '')|split(',') -%}
+    {%- set closed_groups = app.request.cookies.get('sonata_sidebar_closed', '')|split(',') -%}
+    {{ block('list') -}}
+{% endblock %}
+
+{% block item %}
+    {%- if item.displayed -%}
+        {#- check role of the group #}
+        {%- set display = item.extra('roles') is empty or is_granted(sonata_config.getOption('role_super_admin')) or item.extra('roles')|filter(role => is_granted(role))|length > 0 -%}
+    {%- endif -%}
+    {%- if item.displayed and display|default -%}
+        {%- import 'knp_menu.html.twig' as knp_menu -%}
+        {%- set is_current = matcher.isCurrent(item) -%}
+        {%- set is_ancestor = not is_current and matcher.isAncestor(item, options.matchingDepth) -%}
+        {%- set has_children = item.hasChildren and options.depth is not same as(0) and item.displayChildren -%}
+        {%- set keep_open = item.extra('keep_open', false) -%}
+        {%- set classes = ['nav-item'] -%}
+        {%- if item.attribute('class') is not empty -%}
+            {%- set classes = classes|merge([item.attribute('class')|replace({'keep-open': 'menu-open'})]) -%}
+        {%- endif -%}
+        {%- set remembered = item.level == 1 and item.name in open_groups|default([]) -%}
+        {%- set closed_by_user = item.level == 1 and item.name in closed_groups|default([]) -%}
+        {%- if has_children and ((is_ancestor and not closed_by_user) or keep_open or remembered) and 'menu-open' not in classes -%}
+            {%- set classes = classes|merge(['menu-open']) -%}
+        {%- endif -%}
+        {%- set translation_domain = item.extra('translation_domain', item.extra('label_catalogue', 'messages')) -%}
+        {%- if not has_children and item.extra('on_top') is defined and not item.extra('on_top') -%}
+            {%- set icon = item.extra('icon')|default(item.level > 1 ? 'far fa-circle' : '') -%}
+        {%- else -%}
+            {%- set icon = item.extra('icon')|default('') -%}
+        {%- endif -%}
+        <li{{ knp_menu.attributes(item.attributes|merge({class: classes|join(' ')} + (has_children and item.level == 1 ? {'data-adminlte4-group': item.name} : {}))) }}>
+            <a href="{{ item.uri is not empty and not has_children ? item.uri : '#' }}"
+               class="nav-link{% if is_current or is_ancestor %} active{% endif %}"{% if is_current %} aria-current="page"{% endif %}
+               {{- knp_menu.attributes(item.linkAttributes|filter((value, name) => name != 'class')) }}>
+                {%- if icon starts with '<' -%}
+                    <span class="nav-icon">{{ icon|raw }}</span>
+                {%- elseif icon is not empty -%}
+                    {{ (icon ~ ' nav-icon')|parse_icon }}
+                {%- endif -%}
+                <p>
+                    {{ block('label') }}
+                    {%- if has_children and not keep_open -%}
+                        <i class="nav-arrow fas fa-angle-right" aria-hidden="true"></i>
+                    {%- endif -%}
+                </p>
+            </a>
+            {%- if has_children -%}
+                <ul class="nav nav-treeview">
+                    {{ block('children') }}
+                </ul>
+            {%- endif -%}
+        </li>
+    {%- endif -%}
+{% endblock %}
+
+{% block label %}
+    {%- set item_label = item.getLabel() -%}
+    {%- if options.allow_safe_labels and item.extra('safe_label', false) -%}
+        {{ item_label|raw }}
+    {%- else -%}
+        {%- set translation_domain = item.extra('translation_domain', item.extra('label_catalogue', 'messages')) -%}
+        {{ item_label|trans(item.extra('label_translation_parameters', {}), translation_domain) }}
+    {%- endif -%}
+{% endblock %}

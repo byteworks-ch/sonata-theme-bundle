@@ -1,0 +1,72 @@
+// Tom Select's Bootstrap 5 stylesheet fixes some colors for the light color mode (dark text, light chips, light
+// borders): the theme's variables instead, so the dark color mode reads as well. Loaded right after that stylesheet.
+
+.ts-dropdown,
+.ts-control,
+.ts-control input {
+    color: var(--bs-body-color);
+}
+
+// focus in the primary color, so it follows a skin's primary (the stylesheet has Bootstrap's blue built in)
+.focus .ts-control,
+.plugin-dropdown_input.focus .ts-dropdown .dropdown-input {
+    border-color: rgba(var(--bs-primary-rgb), .5);
+    box-shadow: 0 0 0 .25rem rgba(var(--bs-primary-rgb), .25);
+}
+
+.ts-dropdown,
+.plugin-dropdown_input .dropdown-input,
+.ts-wrapper .dropdown-header {
+    border-color: var(--bs-border-color);
+}
+
+.ts-dropdown .optgroup-header,
+.ts-dropdown .create {
+    color: var(--bs-secondary-color);
+}
+
+.ts-dropdown [data-selectable] .highlight {
+    background: rgba(var(--bs-warning-rgb), .35);
+}
+
+.ts-dropdown .spinner::after {
+    border-color: var(--bs-border-color) transparent;
+}
+
+.ts-wrapper .dropdown-header {
+    background: var(--bs-tertiary-bg);
+}
+
+.ts-wrapper .dropdown-header-close {
+    color: var(--bs-body-color);
+}
+
+// the selected items of a multiple select
+.ts-wrapper.multi .ts-control > div {
+    background: var(--bs-secondary-bg);
+    color: var(--bs-emphasis-color);
+}
+
+.ts-wrapper.multi .ts-control > div.active {
+    background: var(--bs-primary);
+    color: #fff;
+}
+
+.ts-wrapper.multi.disabled .ts-control > div,
+.ts-wrapper.multi.disabled .ts-control > div.active {
+    background: var(--bs-secondary-bg);
+    color: var(--bs-secondary-color);
+    border-color: var(--bs-border-color);
+}
+
+.ts-wrapper.plugin-remove_button:not(.rtl) .item .remove {
+    border-left-color: var(--bs-border-color);
+}
+
+.ts-wrapper.plugin-remove_button.rtl .item .remove {
+    border-right-color: var(--bs-border-color);
+}
+
+.ts-wrapper.plugin-remove_button .item .remove:hover {
+    background: rgba(var(--bs-emphasis-color-rgb), .1);
+}

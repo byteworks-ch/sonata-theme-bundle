@@ -1,0 +1,68 @@
+{#
+    Mosaic list mode: a card per object with its image (else sonata_admin.options.mosaic_background), its id, the
+    description on hover or focus, and the title with the batch checkbox. Sonata's blocks stay for templates that
+    extend this one: sonata_mosaic_background, sonata_mosaic_default_view, sonata_mosaic_hover_view and
+    sonata_mosaic_description.
+#}
+<tr>
+    {# NEXT_MAJOR of Sonata: the NAME_ACTIONS check goes, the option "ajax_hidden" replaces it #}
+    <td class="p-3" colspan="{{
+        app.request.isXmlHttpRequest
+            ? admin.list.getElements()|filter(element => element.getOption('ajax_hidden') != true)|length
+                - admin.list.has(constant('Sonata\\AdminBundle\\Datagrid\\ListMapper::NAME_ACTIONS'))
+                - admin.list.has(constant('Sonata\\AdminBundle\\Datagrid\\ListMapper::NAME_BATCH'))
+            : admin.list.getElements()|length
+    }}">
+        <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3">
+            {% for object in admin.datagrid.results %}
+                {% set meta = admin.getObjectMetadata(object) %}
+                {% if admin.hasAccess('edit', object) and admin.hasRoute('edit') %}
+                    {% set _url = admin.generateObjectUrl('edit', object) %}
+                {% elseif admin.hasAccess('show', object) and admin.hasRoute('show') %}
+                    {% set _url = admin.generateObjectUrl('show', object) %}
+                {% else %}
+                    {% set _url = null %}
+                {% endif %}
+                <div class="col">
+                    <div class="card h-100 mosaic-box sonata-ba-list-field-batch sonata-ba-list-field" objectId="{{ admin.id(object) }}">
+                        {% set _inner %}
+                            <div class="mosaic-inner-box-default">
+                                {% block sonata_mosaic_background %}
+                                    {% set metaImage = meta.isImageAvailable is defined and not meta.isImageAvailable ? sonata_config.getOption('mosaic_background') : meta.image %}
+                                    {% if not (metaImage starts with 'data:') %}
+                                        {% set metaImage = asset(metaImage) %}
+                                    {% endif %}
+                                    <img src="{{ metaImage }}" alt="{{ meta.title }}" loading="lazy">
+                                {% endblock %}
+                                {% block sonata_mosaic_default_view %}
+                                    <span class="mosaic-box-label badge text-bg-primary">#{{ admin.id(object) }}</span>
+                                {% endblock %}
+                            </div>
+                            <div class="mosaic-inner-box-hover">
+                                {% block sonata_mosaic_hover_view %}
+                                    <span class="mosaic-box-label badge text-bg-primary float-end ms-2">#{{ admin.id(object) }}</span>
+                                    {{ meta.description }}
+                                {% endblock %}
+                            </div>
+                        {% endset %}
+                        {% if _url %}
+                            <a class="mosaic-inner-box mosaic-inner-link card-img-top" href="{{ _url }}">{{ _inner }}</a>
+                        {% else %}
+                            <div class="mosaic-inner-box card-img-top">{{ _inner }}</div>
+                        {% endif %}
+                        <div class="card-body d-flex align-items-start gap-2 p-2 mosaic-inner-text">
+                            {% if (admin.hasRoute('batch') and batchactions|length > 0) or (admin.hasRoute('export') and admin.hasAccess('export') and export_formats|length) %}
+                                <input type="checkbox" class="form-check-input flex-shrink-0" name="idx[]" value="{{ admin.id(object) }}" aria-label="{{ meta.title }}">
+                            {% endif %}
+                            <span class="text-truncate">
+                                {% block sonata_mosaic_description %}
+                                    {% if _url %}<a href="{{ _url }}" class="mosaic-inner-link">{{ meta.title|u.truncate(40) }}</a>{% else %}{{ meta.title|u.truncate(40) }}{% endif %}
+                                {% endblock %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </td>
+</tr>

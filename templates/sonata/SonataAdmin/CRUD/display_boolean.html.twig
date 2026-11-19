@@ -1,0 +1,15 @@
+{%- apply trim|raw %}
+    {% if value %}
+        {% set text = 'label_type_yes'|trans({}, 'SonataAdminBundle') %}
+    {% else %}
+        {% set text = 'label_type_no'|trans({}, 'SonataAdminBundle') %}
+    {% endif %}
+
+    {% if inverse|default(false) ? not value : value %}
+        {% set class = 'text-bg-success' %}
+    {% else %}
+        {% set class = 'text-bg-danger' %}
+    {% endif %}
+
+    <span class="badge {{ class }}">{{ text }}</span>
+{% endapply -%}

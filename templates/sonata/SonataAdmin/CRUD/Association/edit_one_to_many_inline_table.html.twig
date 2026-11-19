@@ -1,0 +1,74 @@
+{#
+    Inline collection as a table. With the option "sortable", the cell of the position field shows a handle instead
+    of the field (Stimulus controller "sonata-sortable" on the field). A field can set its column width with the attribute "data-col-width" (e.g. "22%" or
+    "12rem"); if a field of the first row does, the table gets a <colgroup> and a fixed layout, and the fields fill
+    their columns. Without widths, the table sizes its columns itself.
+#}
+{% set _sortable = sonata_admin.edit == 'inline' ? sonata_admin.field_description.option('sortable', false) : false %}
+{% set _first_row = form.children|first %}
+{% set _col_widths = _first_row ? _first_row.children|map(field => field.vars.attr['data-col-width']|default(null))|filter(width => width is not null) : [] %}
+<div class="table-responsive">
+    <table class="table table-bordered table-sm align-top mb-2 sonata-ba-inline-table{{ _col_widths is not empty ? ' sonata-inline-table-fixed' }}">
+        {% if _col_widths is not empty %}
+            <colgroup>
+                {% for field_name, nested_field in _first_row.children %}
+                    {% if field_name == '_delete' %}
+                        <col class="sonata-inline-table-delete-col">
+                    {% else %}
+                        {% set _width = nested_field.vars.attr['data-col-width']|default(null) %}
+                        <col{% if _width %} style="width: {{ _width }}"{% endif %}>
+                    {% endif %}
+                {% endfor %}
+            </colgroup>
+        {% endif %}
+        <thead>
+            <tr>
+                {% for field_name, nested_field in _first_row.children %}
+                    {% if field_name == '_delete' %}
+                        <th class="text-center">{{ 'action_delete'|trans({}, 'SonataAdminBundle') }}</th>
+                    {% else %}
+                        <th{% if nested_field.vars['required']|default(false) %} class="required"{% endif %}{% if nested_field.vars['attr']['hidden']|default(false) %} hidden{% endif %}>
+                            {% if nested_field.vars.translation_domain is same as(false) %}
+                                {{ nested_field.vars.label }}
+                            {% else %}
+                                {% set translationDomain = nested_field.vars.translation_domain|default(nested_field.vars['sonata_admin'].admin.translationDomain|default(null)) %}
+                                {{ nested_field.vars.label|trans({}, translationDomain) }}
+                            {% endif %}
+                        </th>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody class="sonata-ba-tbody">
+            {% for nested_group_field_name, nested_group_field in form.children %}
+                <tr>
+                    {% for field_name, nested_field in nested_group_field.children %}
+                        <td class="sonata-ba-td-{{ id }}-{{ field_name }}{% if nested_field.vars.errors|default(false) %} sonata-ba-field-error{% endif %}{% if field_name == '_delete' %} text-center{% endif %}"
+                            {%- if nested_field.vars['attr']['hidden']|default(false) %} hidden{% endif %}>
+                            {% if field_name == '_delete' %}
+                                {{ form_widget(nested_field, {label: false, attr: {'data-action': 'change->sonata-association#toggleDeleted'}}) }}
+                            {% elseif _sortable and field_name == _sortable %}
+                                <span hidden>{{ form_widget(nested_field) }}</span>
+                                <button type="button" class="btn btn-sm btn-link text-body-secondary sonata-ba-sortable-handler"
+                                        title="{{ 'sortable.move'|trans({}, 'ByteworksSonataThemeBundle') }}"
+                                        data-action="keydown->sonata-sortable#move">
+                                    <i class="fas fa-grip-lines" aria-hidden="true"></i>
+                                    <span class="visually-hidden">{{ 'sortable.move'|trans({}, 'ByteworksSonataThemeBundle') }}</span>
+                                </button>
+                            {% else %}
+                                {{ form_widget(nested_field) }}
+                                {% if sonata_admin.field_description.associationadmin.formfielddescriptions[field_name] is defined %}
+                                    {{ form_help(nested_field) }}
+                                    {% set dummy = nested_group_field.setrendered %}
+                                {% endif %}
+                            {% endif %}
+                            {% if nested_field.vars.errors|default(false) %}
+                                <div class="sonata-ba-field-error-messages">{{ form_errors(nested_field) }}</div>
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,44 @@
+{#
+    Latest revisions (audit) on the dashboard: a card with an accordion, the first revision open. Sonata ships no
+    translation for the title; a project's own one wins, else the theme's.
+#}
+{% extends '@SonataBlock/Block/block_base.html.twig' %}
+
+{% block block %}
+    {% set _accordion = 'sonata-audit-' ~ (block.id|default('block')) %}
+    <div class="card card-outline card-primary mb-3">
+        <div class="card-header">
+            <h3 class="card-title">
+                {% set _title = 'title_audit_log'|trans({}, 'SonataAdminBundle') %}
+                <i class="fas fa-history" aria-hidden="true"></i> {{ _title != 'title_audit_log' ? _title : 'audit.title'|trans({}, 'ByteworksSonataThemeBundle') }}
+            </h3>
+        </div>
+        <div class="card-body p-0">
+            <div class="accordion accordion-flush" id="{{ _accordion }}">
+                {% for revision in revisions %}
+                    <div class="accordion-item">
+                        <h4 class="accordion-header">
+                            <button class="accordion-button{% if not loop.first %} collapsed{% endif %}" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#{{ _accordion }}-{{ loop.index }}" aria-expanded="{{ loop.first ? 'true' : 'false' }}"
+                                    aria-controls="{{ _accordion }}-{{ loop.index }}">
+                                {{ revision.revision.rev }} - {{ revision.revision.username }} - {{ revision.revision.timestamp|date }}
+                            </button>
+                        </h4>
+                        <div id="{{ _accordion }}-{{ loop.index }}" class="accordion-collapse collapse{% if loop.first %} show{% endif %}" data-bs-parent="#{{ _accordion }}">
+                            <div class="accordion-body">
+                                <ul class="mb-0">
+                                    {% for changedEntity in revision.entities %}
+                                        <li>
+                                            {{ changedEntity.entity }} / {{ changedEntity.revisionType }}
+                                            / {{ changedEntity.className }} - {{ changedEntity.id.id }}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

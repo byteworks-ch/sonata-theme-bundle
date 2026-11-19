@@ -1,0 +1,30 @@
+{#
+    Flash messages as Bootstrap 5 alerts. With more messages of one type than "collapse", the rest are behind a
+    <details> element (no JavaScript needed).
+#}
+{% set collapse = collapse|default(1) %}
+{% for type in sonata_flashmessages_types() %}
+    {% set messages = sonata_flashmessages_get(type) %}
+    {% set class = sonata_flashmessages_class(type, 'secondary')|adminlte4_color %}
+    {% if messages|length > collapse and collapse > 0 %}
+        <div class="alert alert-{{ class }} alert-dismissible fade show" role="alert">
+            {% for message in messages|slice(0, collapse) %}
+                <div>{{ message|raw }}</div>
+            {% endfor %}
+            <details class="mt-1">
+                <summary>{{ 'more'|trans({}, 'SonataTwigBundle') }} <span class="badge text-bg-{{ class }}">{{ messages|length }}</span></summary>
+                {% for message in messages|slice(collapse) %}
+                    <div>{{ message|raw }}</div>
+                {% endfor %}
+            </details>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ 'message_close'|trans({}, 'SonataTwigBundle') }}"></button>
+        </div>
+    {% elseif messages|length > 0 %}
+        {% for message in messages %}
+            <div class="alert alert-{{ class }} alert-dismissible fade show" role="alert">
+                {{ message|raw }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ 'message_close'|trans({}, 'SonataTwigBundle') }}"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endfor %}

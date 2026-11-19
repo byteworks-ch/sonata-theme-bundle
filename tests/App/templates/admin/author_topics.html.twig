@@ -1,0 +1,13 @@
+{#
+    Example of a long list cell (the test app has none): twelve badges on one line, cut with the theme's class
+    adminlte4-clamp; the full list shows on hover and focus.
+#}
+{% extends '@SonataAdmin/CRUD/base_list_field.html.twig' %}
+
+{% block field %}
+    <div class="adminlte4-clamp" {{ stimulus_controller('adminlte4-clamp') }}>
+        <div class="adminlte4-clamp-content">
+            {%- for i in 1..12 %}<span class="badge text-bg-primary">Topic {{ i }}</span> {% endfor -%}
+        </div>
+    </div>
+{% endblock %}

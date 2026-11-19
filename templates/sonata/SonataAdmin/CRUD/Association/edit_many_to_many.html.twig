@@ -1,0 +1,55 @@
+{#
+    Many-to-many association: inline as a table or as a list of items with their fields, or as a (multiple) select
+    with a button that creates a new object in a modal (Stimulus controller "sonata-association").
+#}
+{% import '@ByteworksSonataTheme/association.html.twig' as association %}
+{% if not sonata_admin.field_description.hasassociationadmin %}
+    {% for element in value %}
+        {{ element|render_relation_element(sonata_admin.field_description) }}
+    {% endfor %}
+{% else %}
+    {% set association_admin = sonata_admin.field_description.associationadmin %}
+    {% set translation_domain_buttons = btn_translation_domain|default(null) is same as(false) ? false : btn_translation_domain|default(btn_catalogue) %}
+    {% set is_inline = sonata_admin.edit == 'inline' %}
+    {% set values = is_inline
+        ? {field: id, mode: 'inline', appendUrl: association.append_url(sonata_admin, id, app) ~ ''}
+        : {field: id, mode: 'model', retrieveUrl: association.retrieve_url(sonata_admin, id, app) ~ ''} %}
+    <div id="field_container_{{ id }}" class="field-container" {{ stimulus_controller('sonata-association', values) }}>
+        <div class="d-flex align-items-start gap-2">
+            <div id="field_widget_{{ id }}" class="flex-grow-1">
+                {% if is_inline %}
+                    {% if sonata_admin.inline == 'table' %}
+                        {% if form.children|length > 0 %}
+                            {% include '@SonataAdmin/CRUD/Association/edit_one_to_many_inline_table.html.twig' %}
+                        {% endif %}
+                    {% else %}
+                        {% for nested_group_field in form.children %}
+                            <div class="sonata-ba-collapsed-fields border rounded p-3 mb-2 adminlte4-inline-item">
+                                {% for field_name, nested_field in nested_group_field.children|filter((nested_field, field_name) => field_name != '_delete') %}
+                                    {{ form_row(nested_field) }}
+                                {% endfor %}
+                                {% if nested_group_field['_delete'] is defined %}
+                                    {{ form_row(nested_group_field['_delete'], {
+                                        label: 'action_delete',
+                                        translation_domain: 'SonataAdminBundle',
+                                        attr: {'data-action': 'change->sonata-association#toggleDeleted'},
+                                    }) }}
+                                {% endif %}
+                                {% if sonata_admin.field_description.associationadmin.formfielddescriptions is not empty %}
+                                    {% set dummy = nested_group_field.setrendered %}
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% else %}
+                    {{ form_widget(form) }}
+                {% endif %}
+            </div>
+            {% if association_admin.hasRoute('create') and association_admin.hasAccess('create') and btn_add %}
+                <span id="field_actions_{{ id }}" class="field-actions btn-group btn-group-sm">
+                    {{ association.button(association_admin.generateUrl('create', sonata_admin.field_description.getOption('link_parameters', {})), is_inline ? 'append' : 'openAdd', 'fas fa-plus-circle', btn_add, translation_domain_buttons) }}
+                </span>
+            {% endif %}
+        </div>
+    </div>
+{% endif %}

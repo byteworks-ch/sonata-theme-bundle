@@ -1,0 +1,27 @@
+{#
+    Date and time picker of the form extensions (Tempus Dominus) as a Bootstrap 5 input group: the toggle is an
+    input-group-text, and there is no second input-group around it (nested input groups break in Bootstrap 5).
+#}
+{% block sonata_type_datetime_picker_widget_html %}
+    <div
+        id="{{ id ~ '_controller' }}"
+        class="input-group date"
+        data-controller="datepicker"
+        data-datepicker-options-value="{{ datepicker_options|json_encode|escape('html_attr') }}"
+        {% if linked_to|default(false) %}data-datepicker-datepicker-outlet="#{{ linked_to ~ '_controller' }}"{% endif %}
+        data-td-target-input="nearest"
+        {% if datepicker_use_button %}data-td-target-toggle="nearest"{% endif %}
+    >
+        {% set attr = attr|merge({'data-td-target': '#' ~ id ~ '_controller'}) %}
+        {{ block('datetime_widget') }}
+        {% if datepicker_use_button %}
+            <span class="input-group-text" role="button" data-td-target="#{{ id ~ '_controller' }}" data-td-toggle="datetimepicker">
+                <i class="fas {% if datepicker_options.display.viewMode is defined and datepicker_options.display.viewMode == 'clock' %}fa-clock{% else %}fa-calendar{% endif %}" aria-hidden="true"></i>
+            </span>
+        {% endif %}
+    </div>
+{% endblock sonata_type_datetime_picker_widget_html %}
+
+{% block sonata_type_datetime_picker_widget %}
+    {{ block('sonata_type_datetime_picker_widget_html') }}
+{% endblock sonata_type_datetime_picker_widget %}

@@ -1,0 +1,23 @@
+{#
+    Form theme of the list filters on Bootstrap 5. The list template renders the labels; checkboxes therefore come
+    without their own label.
+#}
+{% extends 'bootstrap_5_layout.html.twig' %}
+
+{%- block choice_widget_collapsed -%}
+    {%- set _enhance = adminlte4.select.enabled ?? (sonata_config is defined and sonata_config.getOption('use_select2')) -%}
+    {%- if _enhance and multiple and (attr['data-sonata-select2'] is not defined or attr['data-sonata-select2'] not in [false, 'false']) -%}
+        {%- set attr = attr|merge({'data-controller': (attr['data-controller']|default('') ~ ' sonata-select')|trim}) -%}
+    {%- endif -%}
+    {{- parent() -}}
+{%- endblock choice_widget_collapsed -%}
+
+{%- block checkbox_widget -%}
+    <div class="form-check mb-0">
+        <input type="checkbox" {{ block('widget_attributes') }} class="form-check-input"{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %}>
+    </div>
+{%- endblock checkbox_widget -%}
+
+{% block sonata_type_model_autocomplete_widget %}
+    {% include template %}
+{% endblock sonata_type_model_autocomplete_widget %}

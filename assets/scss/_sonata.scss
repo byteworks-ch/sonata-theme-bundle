@@ -1,0 +1,328 @@
+// Sonata's markup on Bootstrap 5 / AdminLTE 4.
+
+// Actions (Sonata's button templates render <li><a class="sonata-action-element">): as dropdown items in the
+// actions menu, as a button when there is just one.
+.adminlte4-actions .dropdown-menu .sonata-action-element,
+.dropdown-user > li > a {
+    @extend .dropdown-item;
+}
+
+.adminlte4-actions-single .sonata-action-element {
+    @extend .btn;
+    @extend .btn-sm;
+    @extend .btn-outline-secondary;
+}
+
+// Sticky form actions (option use_stickyforms).
+.adminlte4-sticky-forms .sonata-ba-form-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+}
+
+// Required fields (labels and table headers of inline collections).
+label.required::after,
+legend.required::after,
+th.required::after {
+    content: " *";
+    color: var(--bs-danger);
+}
+
+// Sortable list headers: every sortable column shows the neutral sort icon after its label; the column the list is
+// sorted by shows the direction in the primary color (carets: centered on the line, unlike sort-up and sort-down,
+// the halves of the neutral icon). The icon stays on the line of the label.
+.sonata-ba-list th[class*="sonata-ba-list-field-header-order-"] > a {
+    color: inherit;
+    text-decoration: none;
+    white-space: nowrap;
+
+    &::after {
+        margin-left: .35rem;
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        color: var(--bs-secondary-color);
+        content: "\f0dc";
+        opacity: .6;
+    }
+
+    &:hover::after,
+    &:focus-visible::after {
+        opacity: 1;
+    }
+}
+
+.sonata-ba-list th.sonata-ba-list-field-order-active > a::after {
+    color: var(--bs-primary);
+    opacity: 1;
+}
+
+.sonata-ba-list th.sonata-ba-list-field-order-active.sonata-ba-list-field-header-order-asc > a::after {
+    content: "\f0d8";
+}
+
+.sonata-ba-list th.sonata-ba-list-field-order-active.sonata-ba-list-field-header-order-desc > a::after {
+    content: "\f0d7";
+}
+
+// Batch selection and list cells.
+// (only the table cells: the cards of the mosaic carry the class as well)
+th.sonata-ba-list-field-header-batch,
+td.sonata-ba-list-field-batch {
+    width: 1%;
+}
+
+.sonata-ba-list-row-selected > td {
+    --bs-table-bg-state: var(--bs-primary-bg-subtle);
+}
+
+.sonata-ba-list-field-actions .btn-group {
+    flex-wrap: nowrap;
+}
+
+// icon and label of an action button on one line, also in a narrow column
+.sonata-ba-list-field-actions .btn {
+    white-space: nowrap;
+}
+
+// The icons of the action buttons equally wide (like Font Awesome's fa-fw), so the buttons are: a narrow glyph such as
+// the cross of "delete" does not make a narrower button.
+.sonata-ba-list-field-actions .btn > i {
+    width: 1.25em;
+    text-align: center;
+}
+
+// The caret of a dropdown button on the middle of the label (Bootstrap's offset suits other fonts).
+.dropdown-toggle::after {
+    vertical-align: middle;
+}
+
+// Filter selection: a checked box for displayed filters.
+.sonata-toggle-filter .far::before {
+    content: "\f0c8";
+}
+
+.sonata-toggle-filter.active .far::before {
+    content: "\f14a";
+}
+
+.dropdown-menu-scrollable {
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+// Show page: the label column equally wide in every card, also in cards of different widths (a half and a whole one),
+// so the values line up: a fixed width (--adminlte4-show-label-width; the default fits a long German word such as
+// "Authentifizierungsmodus" on one line), on phones, where the cards stack, a share of the card. A fixed layout with
+// the width on the colgroup, so a wide value does not take the space of the labels (and a first row over both columns
+// does not set the widths); long values wrap.
+.sonata-ba-view-table {
+    table-layout: fixed;
+
+    > colgroup > .sonata-ba-view-label-col {
+        width: var(--adminlte4-show-label-width, 14rem);
+
+        @include media-breakpoint-down(sm) {
+            width: 40%;
+        }
+    }
+
+    > tbody > tr > td {
+        overflow-wrap: anywhere;
+    }
+}
+
+.sonata-ba-view-table > tbody > tr > th {
+    font-weight: 600;
+}
+
+// Inline editing of list cells (Stimulus controller "sonata-inline-edit").
+.adminlte4-inline-edit {
+    cursor: pointer;
+    border-bottom: 1px dashed var(--bs-secondary-color);
+
+    // a badge (yes/no) without the line, outlined on hover instead
+    &:has(> .badge) {
+        border-bottom: 0;
+    }
+
+    &:hover > .badge,
+    &:focus-visible > .badge {
+        box-shadow: 0 0 0 .15rem rgba(var(--bs-primary-rgb), .4);
+    }
+}
+
+// Inline collections as tables: rows marked for deletion, fixed column widths (attribute data-col-width).
+.adminlte4-row-deleted > td:not(:has([id$="_delete"])),
+.adminlte4-inline-item.adminlte4-row-deleted .tab-content,
+.adminlte4-inline-item.adminlte4-row-deleted > .sonata-ba-collapsed-fields > :not(:has([id$="_delete"])) {
+    opacity: .5;
+}
+
+// Handle of a sortable inline collection; the item being dragged.
+.sonata-ba-sortable-handler {
+    cursor: grab;
+}
+
+.adminlte4-sortable-ghost {
+    opacity: .4;
+}
+
+.sonata-inline-table-fixed {
+    table-layout: fixed;
+
+    .sonata-inline-table-delete-col {
+        width: 5rem;
+    }
+}
+
+.sonata-ba-inline-table td > .form-check {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 0;
+}
+
+// the column header names the checkbox; its own label stays for screen readers only
+.sonata-ba-inline-table td .form-check-label {
+    @extend .visually-hidden;
+}
+
+// Association fields.
+.field-short-description:empty {
+    display: none;
+}
+
+.field-actions .btn {
+    white-space: nowrap;
+}
+
+// Tom Select in an input group or a narrow table cell.
+.ts-wrapper.form-select,
+.ts-wrapper.form-control {
+    min-width: 10rem;
+}
+
+// ... but in a table with fixed column widths (attribute data-col-width) it fits its column; a long value is cut.
+.sonata-inline-table-fixed {
+    .ts-wrapper.form-select,
+    .ts-wrapper.form-control {
+        min-width: 0;
+    }
+
+    .ts-control > .item {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+
+// Global search: boxes without results (option global_search.empty_boxes).
+.search-box-item.sonata-search-result-hide {
+    display: none;
+}
+
+.search-box-item.sonata-search-result-fade {
+    opacity: .5;
+}
+
+// Autocomplete field next to its buttons.
+.adminlte4-autocomplete {
+    min-width: 0;
+}
+
+// Option "dropdown_auto_width" of the autocomplete field (the minimum width comes from the controller).
+.ts-dropdown.adminlte4-dropdown-auto-width {
+    right: auto;
+    width: max-content !important;
+    max-width: 90vw;
+}
+
+// A compound field (collection, date range, choices as radios…) is a fieldset with a legend, as Bootstrap renders
+// it; AdminLTE frames every fieldset, here it looks like any other row and the legend like a label.
+fieldset[id^="sonata-ba-field-container-"] {
+    padding-top: 0;
+    padding-bottom: 0;
+    border: 0;
+
+    // a column of the group's grid keeps the gutter of the grid
+    &:not([class*="col-"]) {
+        padding-right: 0;
+        padding-left: 0;
+    }
+
+    > legend {
+        float: none;
+        padding: 0;
+        margin-bottom: .5rem;
+        font-size: inherit;
+        font-weight: inherit;
+    }
+}
+
+// Mosaic list mode: image with the id, the description over it on hover or focus.
+.mosaic-box {
+    .mosaic-inner-box {
+        position: relative;
+        display: block;
+        overflow: hidden;
+        aspect-ratio: 4 / 3;
+        color: inherit;
+        text-decoration: none;
+        background-color: var(--bs-tertiary-bg);
+    }
+
+    .mosaic-inner-box-default img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .mosaic-inner-box-default .mosaic-box-label {
+        position: absolute;
+        top: .5rem;
+        right: .5rem;
+    }
+
+    .mosaic-inner-box-hover {
+        position: absolute;
+        inset: 0;
+        padding: .75rem;
+        overflow: auto;
+        background-color: rgba(var(--bs-body-bg-rgb), .94);
+        opacity: 0;
+        transition: opacity .15s ease-in-out;
+    }
+
+    .mosaic-inner-box:hover .mosaic-inner-box-hover,
+    .mosaic-inner-box:focus-visible .mosaic-inner-box-hover {
+        opacity: 1;
+    }
+
+    &.sonata-ba-list-row-selected {
+        border-color: var(--bs-primary);
+        box-shadow: 0 0 0 .15rem rgba(var(--bs-primary-rgb), .35);
+    }
+}
+
+// History: differences in a comparison of revisions.
+.sonata-ba-view-table .diff,
+.history-audit-compare .diff {
+    background-color: var(--bs-warning-bg-subtle);
+}
+
+// Access control list: the first column takes the width, the checkboxes are centered.
+.adminlte4-acl-table {
+    th:first-child {
+        width: 100%;
+    }
+
+    .form-check {
+        display: inline-block;
+        min-height: 0;
+        margin-bottom: 0;
+    }
+}
+
+// Layout without header and sidebar.
+.adminlte4-empty-layout .app-content {
+    padding: 0;
+}

@@ -1,0 +1,20 @@
+{#
+    The logo of the pages outside the admin (login, two-factor, errors): option brand.logo, the variant for the color
+    mode of the page, or the title; links to brand.url or the dashboard.
+#}
+{% set _text = adminlte4.brand.text ?? sonata_config.title %}
+{% set _light = adminlte4.brand.logo.light ?? sonata_config.logo %}
+{% set _dark = adminlte4.brand.logo.dark ?? _light %}
+<a href="{{ adminlte4.brand.url ?? path('sonata_admin_dashboard') }}" class="adminlte4-login-logo link-body-emphasis link-underline-opacity-0">
+    {% if sonata_config.getOption('logo_content') in ['icon', 'all'] and _light %}
+        {% if _light == _dark %}
+            <img src="{{ asset(_light) }}" alt="{{ _text }}">
+        {% else %}
+            <img src="{{ asset(_light) }}" alt="{{ _text }}" class="adminlte4-logo-light">
+            <img src="{{ asset(_dark) }}" alt="{{ _text }}" class="adminlte4-logo-dark">
+        {% endif %}
+    {% endif %}
+    {% if sonata_config.getOption('logo_content') in ['text', 'all'] or not _light %}
+        <span class="h3 mb-0">{{ _text }}</span>
+    {% endif %}
+</a>

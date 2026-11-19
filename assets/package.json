@@ -1,0 +1,149 @@
+{
+    "name": "@byteworks/sonata-theme-bundle",
+    "description": "The Stimulus controllers of the theme, described for tools (the Symfony language tools, IDEs). public/app.js registers them; an application does not.",
+    "private": true,
+    "symfony": {
+        "controllers": {
+            "adminlte4-back": {
+                "main": "js/controllers/back_controller.js",
+                "name": "adminlte4-back",
+                "webpackMode": "eager",
+                "fetch": "eager",
+                "enabled": true
+            },
+            "adminlte4-clamp": {
+                "main": "js/controllers/clamp_controller.js",
+                "name": "adminlte4-clamp",
+                "webpackMode": "eager",
+                "fetch": "eager",
+                "enabled": true
+            },
+            "adminlte4-color-mode": {
+                "main": "js/controllers/color_mode_controller.js",
+                "name": "adminlte4-color-mode",
+                "webpackMode": "eager",
+                "fetch": "eager",
+                "enabled": true
+            },
+            "adminlte4-sidebar": {
+                "main": "js/controllers/sidebar_controller.js",
+                "name": "adminlte4-sidebar",
+                "webpackMode": "eager",
+                "fetch": "eager",
+                "enabled": true
+            },
+            "adminlte4-sidebar-menu": {
+                "main": "js/controllers/sidebar_menu_controller.js",
+                "name": "adminlte4-sidebar-menu",
+                "webpackMode": "eager",
+                "fetch": "eager",
+                "enabled": true
+            },
+            "sonata-association": {
+                "main": "js/controllers/association_controller.js",
+                "name": "sonata-association",
+                "webpackMode": "eager",
+                "fetch": "eager",
+                "enabled": true
+            },
+            "sonata-autocomplete": {
+                "main": "js/controllers/autocomplete_controller.js",
+                "name": "sonata-autocomplete",
+                "webpackMode": "eager",
+                "fetch": "eager",
+                "enabled": true
+            },
+            "sonata-batch": {
+                "main": "js/controllers/batch_controller.js",
+                "name": "sonata-batch",
+                "webpackMode": "eager",
+                "fetch": "eager",
+                "enabled": true
+            },
+            "sonata-choice-field-mask": {
+                "main": "js/controllers/choice_field_mask_controller.js",
+                "name": "sonata-choice-field-mask",
+                "webpackMode": "eager",
+                "fetch": "eager",
+                "enabled": true
+            },
+            "sonata-collection": {
+                "main": "js/sonata/collection_controller.js",
+                "name": "sonata-collection",
+                "webpackMode": "eager",
+                "fetch": "eager",
+                "enabled": true
+            },
+            "sonata-confirm-exit": {
+                "main": "js/sonata/confirm_exit_controller.js",
+                "name": "sonata-confirm-exit",
+                "webpackMode": "eager",
+                "fetch": "eager",
+                "enabled": true
+            },
+            "sonata-edit": {
+                "main": "js/controllers/edit_controller.js",
+                "name": "sonata-edit",
+                "webpackMode": "eager",
+                "fetch": "eager",
+                "enabled": true
+            },
+            "sonata-filter": {
+                "main": "js/sonata/filter_controller.js",
+                "name": "sonata-filter",
+                "webpackMode": "eager",
+                "fetch": "eager",
+                "enabled": true
+            },
+            "sonata-filter-list": {
+                "main": "js/sonata/filter_list_controller.js",
+                "name": "sonata-filter-list",
+                "webpackMode": "eager",
+                "fetch": "eager",
+                "enabled": true
+            },
+            "sonata-inline-edit": {
+                "main": "js/controllers/inline_edit_controller.js",
+                "name": "sonata-inline-edit",
+                "webpackMode": "eager",
+                "fetch": "eager",
+                "enabled": true
+            },
+            "sonata-per-page": {
+                "main": "js/sonata/per_page_controller.js",
+                "name": "sonata-per-page",
+                "webpackMode": "eager",
+                "fetch": "eager",
+                "enabled": true
+            },
+            "sonata-readmore": {
+                "main": "js/sonata/readmore_controller.js",
+                "name": "sonata-readmore",
+                "webpackMode": "eager",
+                "fetch": "eager",
+                "enabled": true
+            },
+            "sonata-revision": {
+                "main": "js/sonata/revision_controller.js",
+                "name": "sonata-revision",
+                "webpackMode": "eager",
+                "fetch": "eager",
+                "enabled": true
+            },
+            "sonata-select": {
+                "main": "js/controllers/select_controller.js",
+                "name": "sonata-select",
+                "webpackMode": "eager",
+                "fetch": "eager",
+                "enabled": true
+            },
+            "sonata-sortable": {
+                "main": "js/controllers/sortable_controller.js",
+                "name": "sonata-sortable",
+                "webpackMode": "eager",
+                "fetch": "eager",
+                "enabled": true
+            }
+        }
+    }
+}

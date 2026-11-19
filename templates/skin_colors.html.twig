@@ -1,0 +1,5 @@
+{#- The stylesheet of the application's own colors (option "colors"), after the palette; the version in the URL
+    changes with the colors. Needs the route of the bundle (config/routes.php). -#}
+{% if adminlte4.skin.colors %}
+    <link rel="stylesheet" href="{{ path('byteworks_sonata_theme_colors', {v: adminlte4.skin.colors}) }}">
+{% endif %}

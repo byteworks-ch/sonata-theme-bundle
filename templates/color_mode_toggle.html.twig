@@ -1,0 +1,22 @@
+{# Color mode toggle (light, dark, follow the operating system); the choice is stored in the browser. #}
+{% set _modes = {light: 'fas fa-sun', dark: 'fas fa-moon', auto: 'fas fa-circle-half-stroke'} %}
+<li class="nav-item dropdown" {{ stimulus_controller('adminlte4-color-mode') }}>
+    <button type="button" class="btn btn-link nav-link d-flex align-items-center" data-bs-toggle="dropdown" aria-expanded="false"
+            title="{{ 'color_mode.toggle'|trans({}, 'ByteworksSonataThemeBundle') }}">
+        <i class="fas fa-circle-half-stroke fa-fw" aria-hidden="true" {{ stimulus_target('adminlte4-color-mode', 'icon') }}></i>
+        <span class="visually-hidden">{{ 'color_mode.toggle'|trans({}, 'ByteworksSonataThemeBundle') }}</span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end">
+        {% for mode, icon in _modes %}
+            <li>
+                <button type="button" class="dropdown-item d-flex align-items-center gap-2" aria-pressed="false"
+                        data-mode="{{ mode }}" data-icon="{{ icon }}"
+                        {{ stimulus_action('adminlte4-color-mode', 'select') }} {{ stimulus_target('adminlte4-color-mode', 'option') }}>
+                    <i class="{{ icon }} fa-fw" aria-hidden="true"></i>
+                    {{ ('color_mode.' ~ mode)|trans({}, 'ByteworksSonataThemeBundle') }}
+                    <i class="fas fa-check ms-auto adminlte4-color-mode-check" aria-hidden="true"></i>
+                </button>
+            </li>
+        {% endfor %}
+    </ul>
+</li>

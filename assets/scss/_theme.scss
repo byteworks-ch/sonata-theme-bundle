@@ -1,0 +1,509 @@
+// Theme parts outside Sonata's markup: brand with logo variants, color mode toggle, sidebar search and footer.
+
+// Logo variants (templates/brand.html.twig): one variant per background color of the sidebar, and the symbol
+// for the collapsed sidebar.
+.brand-link .adminlte4-logo {
+    max-width: 100%;
+    width: auto;
+}
+
+.app-sidebar[data-bs-theme="dark"] .adminlte4-logo-light,
+.app-sidebar[data-bs-theme="light"] .adminlte4-logo-dark,
+[data-bs-theme="dark"] .app-sidebar:not([data-bs-theme]) .adminlte4-logo-light,
+[data-bs-theme="light"] .app-sidebar:not([data-bs-theme]) .adminlte4-logo-dark {
+    display: none;
+}
+
+.adminlte4-logo-mini {
+    display: none;
+}
+
+@include media-breakpoint-up(lg) {
+    .sidebar-mini.sidebar-collapse .app-sidebar:not(:hover) {
+        .adminlte4-logo-full {
+            display: none;
+        }
+
+        .adminlte4-logo-mini:not(.adminlte4-logo-light):not(.adminlte4-logo-dark),
+        &[data-bs-theme="dark"] .adminlte4-logo-mini.adminlte4-logo-dark,
+        &[data-bs-theme="light"] .adminlte4-logo-mini.adminlte4-logo-light {
+            display: inline-block;
+        }
+    }
+}
+
+// Color mode toggle (templates/color_mode_toggle.html.twig): the check mark shows the active mode.
+.adminlte4-color-mode-check {
+    visibility: hidden;
+}
+
+.dropdown-item.active .adminlte4-color-mode-check {
+    visibility: visible;
+}
+
+// Sidebar menu: AdminLTE gives the current page, the group that contains it and every open group the same light
+// background. Here the current page has the primary color, its group keeps the light background and other open
+// groups have one only on hover. On a colored sidebar (a skin's color, often the primary itself) the current page is
+// a stronger tint of the text color instead.
+.app-sidebar .sidebar-menu {
+    .nav-item.menu-open > .nav-link:not(.active):not(:hover):not(:focus-visible) {
+        color: var(--lte-sidebar-color);
+        background-color: transparent;
+    }
+
+    .nav-item > .nav-link.active[aria-current="page"] {
+        color: var(--lte-primary-color, #fff);
+        background-color: var(--bs-primary);
+    }
+}
+
+.app-sidebar:is([class*="text-bg-"], [class*="bg-gradient-"]) .sidebar-menu .nav-item > .nav-link.active[aria-current="page"] {
+    color: var(--bs-emphasis-color);
+    background-color: rgba(var(--bs-emphasis-color-rgb), .2);
+}
+
+// Groups: every group lies on a band of its own, closed as a tile around its icon, open with its entries below. So a
+// group shows as a group, above all in the collapsed sidebar, where the icons of groups, their entries and single menu
+// items otherwise run into one column. The band is a veil of the sidebar's emphasis color (white on a dark sidebar,
+// black on a light one, after its data-bs-theme), so it takes the tone of any background. It is the same in the
+// collapsed and in the expanded sidebar, so no icon moves when the sidebar opens (on hover) or closes. The highlight of
+// a link on hover covers it exactly where they meet: the band has the links' radius, it starts with the group's link and
+// ends with its link (closed) or its last entry (open). AdminLTE's space below a link stays inside the band only between
+// the group's link and its entries. Collapsed, the icons of the entries are a little dimmer than the ones of the groups
+// (no other size, no other place).
+.app-sidebar .sidebar-menu > .nav-item[data-adminlte4-group] {
+    margin-bottom: .375rem;
+    background-color: rgba(var(--bs-emphasis-color-rgb), .07);
+    @include border-radius($border-radius); // as AdminLTE rounds the links
+
+    > .nav-link,
+    > .nav-treeview > .nav-item:last-child > .nav-link {
+        margin-bottom: 0;
+    }
+
+    > .nav-treeview {
+        padding-top: .2rem;
+    }
+}
+
+.sidebar-mini.sidebar-collapse .app-sidebar:not(:hover) .sidebar-menu > .nav-item.menu-open > .nav-treeview .nav-link:not(.active) .nav-icon {
+    opacity: .75;
+}
+
+// A menu entry keeps the focus of a click. AdminLTE shows focus like hover, so a group clicked open and closed again
+// stayed highlighted until something else got the focus. The focus shows for the keyboard only (focus-visible).
+.app-sidebar .sidebar-menu .nav-link:focus:not(:focus-visible):not(:hover):not(.active) {
+    color: var(--lte-sidebar-color);
+    background-color: transparent;
+}
+
+// AdminLTE focuses the first control of a modal when it opens, mostly the close button in its header, and Bootstrap
+// shows the focus of a close button for any focus: every modal opened by mouse showed the ring around its close button.
+// The ring shows for the keyboard only (focus-visible).
+.btn-close:focus:not(:focus-visible):not(:hover) {
+    box-shadow: none;
+    opacity: var(--bs-btn-close-opacity);
+}
+
+// Sidebar search and footer.
+// Sidebar search: a row of the height of a menu entry, the icon on the line of the menu icons. Collapsed to the icon
+// bar, only the icon stays and the row keeps its size: the menu below does not move when the sidebar opens on hover.
+.adminlte4-sidebar-search {
+    margin-top: .5rem;
+}
+
+.adminlte4-sidebar-search-field {
+    display: flex;
+    align-items: center;
+    height: 2.5rem;
+    padding: 0 .5rem 0 calc(#{$adminlte4-sidebar-link-padding-x} - var(--bs-border-width));
+    overflow: hidden;
+    color: var(--lte-sidebar-color);
+    background-color: var(--bs-body-bg);
+    border: var(--bs-border-width) solid var(--bs-border-color);
+    border-radius: var(--bs-border-radius);
+    transition: border-color .15s ease-in-out, background-color .15s ease-in-out, box-shadow .15s ease-in-out;
+
+    &:focus-within {
+        border-color: var(--bs-primary-border-subtle);
+        box-shadow: 0 0 0 .2rem rgba(var(--bs-primary-rgb), .25);
+    }
+}
+
+// AdminLTE's compact mode: the row as high as a compact menu entry.
+.compact-mode .adminlte4-sidebar-search-field {
+    height: 2rem;
+}
+
+.adminlte4-sidebar-search-button {
+    display: flex;
+    flex: 0 0 1.5rem;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    padding: 0;
+    color: inherit;
+    background: none;
+    border: 0;
+
+    &:hover,
+    &:focus-visible {
+        color: var(--lte-sidebar-hover-color);
+    }
+}
+
+.adminlte4-sidebar-search-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin-left: .5rem;
+    padding: 0;
+    color: var(--bs-body-color);
+    background: transparent;
+    border: 0;
+    outline: 0;
+
+    &::placeholder {
+        color: var(--lte-sidebar-color);
+        opacity: .75;
+    }
+}
+
+// The collapsed sidebar held open across a page load (assets/js/lib/sidebar-hold.js) is open from the first frame:
+// its texts do not fade in as they do on hover.
+.adminlte4-sidebar-hold .sidebar-mini.sidebar-collapse .app-sidebar * {
+    animation-duration: 0s !important;
+}
+
+.sidebar-mini.sidebar-collapse .app-sidebar:not(:hover) {
+    .adminlte4-sidebar-search-field {
+        background-color: transparent;
+        border-color: transparent;
+        box-shadow: none;
+    }
+
+    .adminlte4-sidebar-search-input {
+        visibility: hidden;
+    }
+}
+
+// The logo at the start of the brand area (AdminLTE centers it; a wide logo with the name looks off), centered in
+// the collapsed icon bar.
+.app-sidebar .sidebar-brand {
+    justify-content: flex-start;
+}
+
+.sidebar-mini.sidebar-collapse .app-sidebar:not(:hover) .sidebar-brand {
+    justify-content: center;
+}
+
+// the footer at the bottom of the sidebar, below a short menu as well
+.app-sidebar .sidebar-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+// Sidebar footer (block side_bar_after_nav_content): its sections (links, copyright ...) separated by a line, with the
+// padding of the menu. Links in the menu's markup (ul.nav.sidebar-menu > li.nav-item > a.nav-link with i.nav-icon and
+// p) look like menu entries and keep their icon in the collapsed icon bar. Other text goes into .adminlte4-sidebar-swap
+// with a stand-in for the icon bar (see below).
+.sidebar-footer {
+    padding: .5rem 0 0;
+    margin-top: auto;
+    border-top: var(--bs-border-width) solid var(--bs-border-color);
+    color: var(--bs-secondary-color);
+
+    > * + * {
+        margin-top: .5rem;
+        padding-top: .5rem;
+        border-top: var(--bs-border-width) solid var(--bs-border-color);
+    }
+
+    a:not(.nav-link) {
+        color: var(--lte-sidebar-color);
+        text-decoration: none;
+
+        &:hover,
+        &:focus-visible {
+            color: var(--lte-sidebar-hover-color);
+        }
+    }
+}
+
+// Text of the open sidebar (.adminlte4-sidebar-full) and its stand-in for the collapsed icon bar
+// (.adminlte4-sidebar-mini, e.g. an icon with the text as tooltip), on the same spot: both always take their place, only
+// one is visible, so nothing moves when the sidebar opens or closes. With the padding of a menu link, an icon with
+// AdminLTE's class nav-icon sits on the line of the menu icons.
+.adminlte4-sidebar-swap {
+    display: grid;
+    padding-inline: $adminlte4-sidebar-link-padding-x;
+
+    > * {
+        grid-area: 1 / 1;
+    }
+
+    > .adminlte4-sidebar-full {
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    > .adminlte4-sidebar-mini {
+        align-self: center;
+        visibility: hidden;
+    }
+}
+
+.sidebar-mini.sidebar-collapse .app-sidebar:not(:hover) .adminlte4-sidebar-swap {
+    > .adminlte4-sidebar-full {
+        visibility: hidden;
+    }
+
+    > .adminlte4-sidebar-mini {
+        visibility: visible;
+    }
+}
+
+// "Add new" menu of the header: dashboard groups in columns.
+.dropdown-menu.adminlte4-dropdown-add {
+    grid-template-columns: repeat(var(--adminlte4-columns, 1), minmax(11rem, auto));
+
+    &.show {
+        display: grid;
+    }
+
+    .dropdown-header {
+        text-align: start;
+    }
+
+    @media (max-width: 575.98px) {
+        grid-template-columns: minmax(11rem, auto);
+    }
+}
+
+// Breadcrumb in the header bar (option layout.breadcrumb "header", as Sonata): in the colors of the bar, so it reads on
+// every skin, on one line; a long last entry ends with an ellipsis.
+.app-header .adminlte4-header-breadcrumb {
+    flex: 1 1 auto;
+    align-items: center;
+    min-width: 0;
+    margin-inline-start: .5rem;
+
+    .breadcrumb {
+        --bs-breadcrumb-divider-color: var(--bs-navbar-color);
+        --bs-breadcrumb-item-active-color: var(--bs-navbar-active-color);
+        flex-wrap: nowrap;
+        float: none !important;
+        min-width: 0;
+        margin: 0;
+        white-space: nowrap;
+    }
+
+    .breadcrumb-item {
+        min-width: 0;
+    }
+
+    .breadcrumb-item.active {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    a {
+        color: var(--bs-navbar-color);
+        text-decoration: none;
+
+        &:hover,
+        &:focus-visible {
+            color: var(--bs-navbar-hover-color);
+        }
+    }
+}
+
+// With the breadcrumb in the header bar, the page title shares its line with the tab menu and the actions (as
+// Sonata's content header did).
+.adminlte4-breadcrumb-in-header > .container-fluid {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .5rem 1rem;
+
+    > .row {
+        flex: 1 1 12rem;
+        margin: 0;
+
+        > * {
+            margin-top: 0;
+            padding-inline: 0;
+        }
+    }
+
+    > .adminlte4-toolbar {
+        margin-top: 0 !important;
+    }
+}
+
+// Sidebar links with the theme's padding (see app.scss), in the open sidebar and in the icon bar.
+.app-sidebar .sidebar-menu .nav-link {
+    --bs-nav-link-padding-x: #{$adminlte4-sidebar-link-padding-x};
+}
+
+// A dark sidebar on Bootstrap's surface, a shade darker than the page.
+.app-sidebar.bg-body-secondary[data-bs-theme="dark"],
+[data-bs-theme="dark"] .app-sidebar.bg-body-secondary:not([data-bs-theme]) {
+    --bs-secondary-bg: #{$adminlte4-sidebar-bg-dark};
+    --bs-secondary-bg-rgb: #{to-rgb($adminlte4-sidebar-bg-dark)};
+}
+
+// Header row of tables: a quiet band in small capitals, the sort links in its color. In Sonata's lists the header and the
+// rows have the same minimum height.
+.table > thead > tr > th {
+    color: var(--bs-secondary-color);
+    font-size: $adminlte4-table-head-font-size;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    background-color: var(--bs-tertiary-bg);
+
+    a {
+        color: inherit;
+    }
+}
+
+.sonata-ba-list > thead > tr > th,
+.sonata-ba-list > tbody > tr > td {
+    height: $adminlte4-list-row-height;
+    vertical-align: middle;
+}
+
+// A table in a card body without padding (the dashboard's admin lists, the show pages, the lists): its cells take no
+// background of their own, the card has the same one. Otherwise they paint square corners over the rounded corners of
+// the card where the table ends it. There the last row needs no line of its own either: the border of the card is it.
+.card > .card-body.p-0 > .table,
+.card > .card-body.p-0 > .table-responsive > .table {
+    --bs-table-bg: transparent;
+}
+
+.card > .card-body.p-0:last-child > .table > tbody > tr:last-child > *,
+.card > .card-body.p-0:last-child > .table-responsive > .table > tbody > tr:last-child > * {
+    border-bottom-width: 0;
+}
+
+// Elements with a background of their own that begin or end a card take its rounded corners; otherwise they paint
+// square ones over them. The inner corners of the card: at the top of an outline card (AdminLTE's top border of 3px,
+// the sides of 1px) less high than wide.
+.card {
+    --adminlte4-card-inner-top-radius: var(--bs-card-inner-border-radius);
+}
+
+.card.card-outline {
+    --adminlte4-card-inner-top-radius: var(--bs-card-inner-border-radius) calc(var(--bs-card-border-radius) - 3px);
+}
+
+// A table at the edge of a card body without padding: the header row at the top of a card without a header (the
+// lists, the history), a row on hover or the current revision at the bottom. A scrolling card body clips the table
+// anyway, so it takes the corners. A body that does not scroll must not clip (the dropdown of the dashboard's create
+// button would be cut off): there the corner cells of the table take them.
+.card > .card-body.p-0.table-responsive:first-child {
+    border-top-left-radius: var(--adminlte4-card-inner-top-radius);
+    border-top-right-radius: var(--adminlte4-card-inner-top-radius);
+}
+
+.card > .card-body.p-0.table-responsive:last-child {
+    border-bottom-left-radius: var(--bs-card-inner-border-radius);
+    border-bottom-right-radius: var(--bs-card-inner-border-radius);
+}
+
+.card > .card-body.p-0:first-child > .table > :first-child > tr:first-child {
+    > :first-child {
+        border-top-left-radius: var(--adminlte4-card-inner-top-radius);
+    }
+
+    > :last-child {
+        border-top-right-radius: var(--adminlte4-card-inner-top-radius);
+    }
+}
+
+.card > .card-body.p-0:last-child > .table > :last-child > tr:last-child {
+    > :first-child {
+        border-bottom-left-radius: var(--bs-card-inner-border-radius);
+    }
+
+    > :last-child {
+        border-bottom-right-radius: var(--bs-card-inner-border-radius);
+    }
+}
+
+// Login and two-factor pages: AdminLTE gives the card body the color of the card, which the card has anyway.
+.login-card-body,
+.register-card-body {
+    background-color: transparent;
+}
+
+// An accordion in a card body without padding (the dashboard's audit block): its items have the color of the card.
+.card > .card-body.p-0 > .accordion-flush {
+    --bs-accordion-bg: transparent;
+}
+
+// Long content of a list cell on one line (e.g. many badges): cut with an ellipsis, the row keeps its height. When the
+// content is cut (class is-clamped, Stimulus controller "adminlte4-clamp"), it shows in full on hover and focus, on a
+// layer in the same design over the cell; the controller places it in the window, so no scrolling container cuts it
+// off. The content is cut at --adminlte4-clamp-width (a length, default 24rem); a column that is wider (e.g. by the
+// field's header_style) is used in full.
+.adminlte4-clamp {
+    width: max-content;
+    max-width: var(--adminlte4-clamp-width, 24rem);
+    min-width: 100%;
+
+    // Cut content counts with exactly that width in the table layout (as when it is in the flow), also while it floats
+    // over the cell: the column does not jump on hover and focus.
+    &.is-clamped {
+        width: var(--adminlte4-clamp-width, 24rem);
+        cursor: default;
+    }
+}
+
+.adminlte4-clamp-content {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.adminlte4-clamp.is-clamped:is(:hover, :focus-within) > .adminlte4-clamp-content {
+    position: fixed;
+    z-index: $zindex-dropdown;
+    top: calc(var(--adminlte4-clamp-top) - .375rem);
+    left: calc(var(--adminlte4-clamp-left) - .5rem);
+    width: max-content;
+    max-width: min(36rem, calc(100vw - var(--adminlte4-clamp-left) - 1rem));
+    padding: .375rem .5rem;
+    white-space: normal;
+    background-color: var(--bs-body-bg);
+    border: var(--bs-border-width) solid var(--bs-border-color);
+    border-radius: var(--bs-border-radius);
+    box-shadow: var(--bs-box-shadow);
+}
+
+.adminlte4-clamp.is-clamped.is-clamped-up:is(:hover, :focus-within) > .adminlte4-clamp-content {
+    top: auto;
+    bottom: calc(var(--adminlte4-clamp-bottom) - .375rem);
+}
+
+// Page title and toolbar of the content header.
+.adminlte4-page-title {
+    font-weight: 400;
+}
+
+// Login layout: the logo for the color mode of the page.
+.adminlte4-login-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+
+    img {
+        max-width: 100%;
+        max-height: 4rem;
+    }
+}
+
+[data-bs-theme="dark"] .adminlte4-login-logo .adminlte4-logo-light,
+[data-bs-theme="light"] .adminlte4-login-logo .adminlte4-logo-dark {
+    display: none;
+}

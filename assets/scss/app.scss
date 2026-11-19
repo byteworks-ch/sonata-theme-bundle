@@ -1,0 +1,51 @@
+// Bootstrap and AdminLTE from their sources: applications with an own build can override the variables before
+// importing this file; the built assets use the defaults.
+
+// The theme's look, on Bootstrap's and AdminLTE's variables (all !default, so an own build can set others before
+// importing this file). Colors of header, sidebar and primary come from the skin.
+
+// neutral grays instead of Bootstrap's cool, bluish ones; anthracite in the dark color mode
+$body-tertiary-bg: #f6f6f7 !default;
+$body-secondary-bg: #ececee !default;
+$border-color: #e3e3e6 !default;
+$border-color-translucent: rgba(0, 0, 0, .1) !default;
+$body-bg-dark: #2b2c2f !default;
+$body-tertiary-bg-dark: #323336 !default;
+$body-secondary-bg-dark: #393a3e !default;
+$border-color-dark: #46474c !default;
+$border-color-translucent-dark: rgba(255, 255, 255, .1) !default;
+$body-color-dark: #e1e2e5 !default;
+// a dark sidebar on Bootstrap's surface a shade darker than the page (skins with a colored sidebar keep their color)
+$adminlte4-sidebar-bg-dark: #232427 !default;
+
+// cards: a light frame, a soft shadow, the header without a fill; Bootstrap's radius (along a larger one the top line
+// of 3px of the outline cards visibly runs out into the sides of 1px)
+$card-cap-bg: transparent !default;
+$lte-card-shadow: 0 1px 2px rgba(0, 0, 0, .05) !default;
+
+// tables: no stripes, fine lines; the header row in small capitals (see _theme.scss); in Sonata's lists the header and
+// every row at least as high as a row with the small button group of the actions, so all of them line up
+$table-striped-bg-factor: 0 !default;
+$table-border-color: var(--bs-border-color-translucent) !default;
+$adminlte4-table-head-font-size: .8125rem !default;
+$adminlte4-list-row-height: 3rem !default;
+
+// form labels bold; placeholders in the tertiary color (half of the body color) instead of the secondary one (three
+// quarters), which hardly differs from an entered value
+$form-label-font-weight: 600 !default;
+$input-placeholder-color: var(--bs-tertiary-color) !default;
+
+// code (names, keys) in the primary's text color of the skin instead of Bootstrap's pink, in both color modes
+$code-color: var(--bs-primary-text-emphasis) !default;
+$code-color-dark: var(--bs-primary-text-emphasis) !default;
+
+// sidebar: links with half of Bootstrap's padding, so the collapsed icon bar is narrower (AdminLTE's formula:
+// (padding of the links + padding of the sidebar + .8rem) * 2) and the selected entry nearly square; the icons stay
+// on their line when the sidebar opens
+$adminlte4-sidebar-link-padding-x: .5rem !default;
+$lte-sidebar-mini-width: ($adminlte4-sidebar-link-padding-x + .5rem + .8rem) * 2 !default;
+
+@import "admin-lte/src/scss/adminlte";
+
+@import "sonata";
+@import "theme";

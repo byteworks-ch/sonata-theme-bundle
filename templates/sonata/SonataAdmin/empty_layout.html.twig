@@ -1,0 +1,18 @@
+{#
+    Layout without header, sidebar and breadcrumb (e.g. for a page in a popup window): only the content. Sonata adds
+    an inline style for AdminLTE 2's ".content"; here the class "adminlte4-empty-layout" does the same.
+#}
+{% extends get_global_template('layout') %}
+
+{% block sonata_header %}{% endblock %}
+{% block sonata_left_side %}{% endblock %}
+{% block sonata_nav %}{% endblock %}
+{% block sonata_breadcrumb %}{% endblock %}
+
+{% block sonata_wrapper %}
+    <main class="app-main adminlte4-empty-layout">
+        {% block sonata_page_content %}
+            {{ parent() }}
+        {% endblock %}
+    </main>
+{% endblock %}

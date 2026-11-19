@@ -1,0 +1,14 @@
+{#
+    Layout of the test app: the theme's layout with an own entry in the header (left of the theme's fullscreen and
+    color mode toggles), the way a project adds its entries there.
+#}
+{% extends '@SonataAdmin/standard_layout.html.twig' %}
+
+{% block adminlte4_navbar_items %}
+    <li class="nav-item">
+        <a class="nav-link adminlte4-test-help" href="https://docs.sonata-project.org/projects/SonataAdminBundle/en/4.x/" title="Help">
+            <i class="fas fa-circle-question" aria-hidden="true"></i>
+            <span class="visually-hidden">Help</span>
+        </a>
+    </li>
+{% endblock %}

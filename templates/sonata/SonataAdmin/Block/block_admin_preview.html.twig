@@ -1,0 +1,75 @@
+{#
+    Preview of an admin's list on the dashboard (filters, limit and text from the block settings): a card with the
+    first rows and a link to the whole list.
+#}
+{% extends sonata_block.templates.block_base %}
+
+{% set translation_domain = settings.translation_domain ?? admin.translationDomain %}
+
+{% block block %}
+    {% set inlineAnchor = settings.text|replace({'.': '_'}) %}
+    {% set results_count = admin.datagrid.pager.countResults %}
+    <div class="card card-outline card-primary mb-3" id="{{ inlineAnchor }}">
+        <div class="card-header">
+            <h3 class="card-title">
+                {{ settings.icon|default('')|parse_icon }}
+                <a href="#{{ inlineAnchor }}" class="link-body-emphasis link-underline-opacity-0">
+                    {% if translation_domain is same as(false) %}
+                        {{ settings.text }}
+                    {% else %}
+                        {{ settings.text|trans({}, translation_domain) }}
+                    {% endif %}
+                </a>
+            </h3>
+        </div>
+        <div class="card-body{% if results_count > 0 %} p-0 table-responsive{% endif %}">
+            {{ sonata_block_render_event('sonata.admin.list.table.top', {'admin': admin}) }}
+            {% block list_header %}{% endblock %}
+            {% if results_count > 0 %}
+                <table class="table table-striped table-hover align-middle mb-0 sonata-ba-list">
+                    {% block table_header %}
+                        <thead>
+                            <tr class="sonata-ba-list-field-header">
+                                {% for field_description in admin.list.getElements() %}
+                                    {% if field_description.name == constant('Sonata\\AdminBundle\\Datagrid\\ListMapper::NAME_SELECT') %}
+                                        <th class="sonata-ba-list-field-header sonata-ba-list-field-header-select"></th>
+                                    {% else %}
+                                        <th class="sonata-ba-list-field-header-{{ field_description.type }}{% if field_description.option('header_class') is not null %} {{ field_description.option('header_class') }}{% endif %}"{% if field_description.option('header_style') is not null %} style="{{ field_description.option('header_style') }}"{% endif %}>
+                                            {% if field_description.option('label_icon') %}
+                                                <span class="sonata-ba-list-field-header-label-icon">{{ field_description.option('label_icon')|parse_icon }}</span>
+                                            {% endif %}
+                                            {% if field_description.translationDomain is same as(false) %}
+                                                {{ field_description.label }}
+                                            {% else %}
+                                                {{ field_description.label|trans({}, field_description.translationDomain) }}
+                                            {% endif %}
+                                        </th>
+                                    {% endif %}
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                    {% endblock %}
+                    {% block table_body %}
+                        <tbody>
+                            {% include get_admin_template('outer_list_rows_' ~ admin.getListMode(), admin.code) %}
+                        </tbody>
+                    {% endblock %}
+                    {% block table_footer %}
+                    {% endblock %}
+                </table>
+            {% else %}
+                {% block no_result_content %}
+                    <p class="text-body-secondary mb-0">{{ 'no_result'|trans({}, 'SonataAdminBundle') }}</p>
+                {% endblock %}
+            {% endif %}
+            {{ sonata_block_render_event('sonata.admin.list.table.bottom', {'admin': admin}) }}
+        </div>
+        {% if results_count > 0 and admin.hasAccess('list') %}
+            <div class="card-footer">
+                <a href="{{ admin.generateUrl('list', {filter: settings.filters}) }}" class="btn btn-primary w-100">
+                    <i class="fas fa-list" aria-hidden="true"></i> {{ 'preview_view_more'|trans({}, 'SonataAdminBundle') }}
+                </a>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

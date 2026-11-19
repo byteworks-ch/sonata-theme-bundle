@@ -1,0 +1,54 @@
+color_mode:
+    toggle: Color mode
+    light: Light
+    dark: Dark
+    auto: Auto
+autocomplete:
+    no_results: No results found
+    too_short: '{1} Please enter 1 or more characters|]1,Inf[ Please enter %count% or more characters'
+    loading_more: Loading more results…
+sortable:
+    move: Move (drag, or arrow keys)
+audit:
+    title: Audit log
+batch:
+    action: Batch action
+list:
+    empty:
+        none: No entries yet.
+        filtered: No entries match these filters.
+fullscreen:
+    toggle: Fullscreen
+error:
+    back: Back
+    home: Go to the start page
+    400:
+        title: Bad request
+        message: The request is malformed and could not be processed.
+    401:
+        title: Sign-in required
+        message: This page requires you to sign in.
+    403:
+        title: Access denied
+        message: You do not have permission to view this page.
+    404:
+        title: Page not found
+        message: This page does not exist or no longer exists. The link may be outdated or the address mistyped.
+    405:
+        title: Request not allowed
+        message: This page does not support this kind of request.
+    410:
+        title: Page removed
+        message: This page no longer exists.
+    429:
+        title: Too many requests
+        message: Too many requests arrived in a short time. Please wait a moment and try again.
+    500:
+        title: Something went wrong
+        message: An unexpected error occurred on the server. Please try again later.
+    503:
+        title: Temporarily unavailable
+        message: The application cannot be reached right now, for example because of maintenance. Please try again later.
+    client:
+        title: Request not possible
+        message: The request could not be processed.

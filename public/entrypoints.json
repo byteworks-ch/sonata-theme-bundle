@@ -1,0 +1,27 @@
+{
+  "entrypoints": {
+    "app": {
+      "css": [
+        "./app.css"
+      ],
+      "js": [
+        "./app.js"
+      ]
+    },
+    "head": {
+      "js": [
+        "./head.js"
+      ]
+    },
+    "colors": {
+      "css": [
+        "./colors.css"
+      ]
+    },
+    "colors-v3": {
+      "css": [
+        "./colors-v3.css"
+      ]
+    }
+  }
+}

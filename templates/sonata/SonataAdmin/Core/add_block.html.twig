@@ -1,0 +1,42 @@
+{#
+    "Add new" menu of the header: per dashboard group its creatable admins (the subclasses of an admin indented below
+    its name), in columns of sonata_admin.options.dropdown_number_groups_per_colums groups, side by side.
+#}
+{% set items_per_column = max(sonata_config.getOption('dropdown_number_groups_per_colums'), 1) %}
+{% set groups = get_sonata_dashboard_groups_with_creatable_admins()|filter(group => group.roles is empty or is_granted(sonata_config.getOption('role_admin')) or group.roles|filter(role => is_granted(role))|length > 0) %}
+{% if groups|length > 0 %}
+    {% set columns = groups|batch(items_per_column) %}
+    <div class="dropdown-menu dropdown-menu-end adminlte4-dropdown-add" style="--adminlte4-columns: {{ columns|length }}">
+        {% for column in columns %}
+            <div class="adminlte4-dropdown-add-column">
+                {% for group in column %}
+                    {% if not loop.first %}
+                        <hr class="dropdown-divider">
+                    {% endif %}
+                    <h6 class="dropdown-header">
+                        {{ group.icon|parse_icon }}
+                        {% if group.translation_domain|default(null) is same as(false) %}
+                            {{ group.label }}
+                        {% else %}
+                            {{ group.label|trans({}, group.translation_domain|default(group.label_catalogue)) }}
+                        {% endif %}
+                    </h6>
+                    {% for admin in group.items %}
+                        {% if admin.hasRoute('create') and admin.hasAccess('create') %}
+                            {% if admin.subClasses is empty %}
+                                <a class="dropdown-item" href="{{ admin.generateUrl('create') }}">
+                                    {% if admin.label is not empty %}{{ admin.label|trans({}, admin.translationdomain) }}{% endif %}
+                                </a>
+                            {% else %}
+                                <span class="dropdown-item-text text-body-secondary">{{ admin.label|trans({}, admin.translationdomain) }}</span>
+                                {% for subclass in admin.subclasses|keys %}
+                                    <a class="dropdown-item ps-4" href="{{ admin.generateUrl('create', {subclass: subclass}) }}">{{ subclass|trans({}, admin.translationdomain) }}</a>
+                                {% endfor %}
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}

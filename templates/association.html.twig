@@ -1,0 +1,52 @@
+{#
+    Helpers for the association widgets (Stimulus controller "sonata-association"): the URLs Sonata's own scripts
+    built inline, and the action buttons. The URL macros return the URL unescaped ("raw"): the attribute that takes
+    it escapes it once.
+#}
+
+{# short description of the associated object; "__OBJECT_ID__" is replaced in the browser #}
+{% macro short_url(sonata_admin, object_id, app) %}
+    {%- set association_admin = sonata_admin.field_description.associationadmin -%}
+    {{- path('sonata_admin_short_object_information', {
+        _sonata_admin: association_admin.baseCodeRoute,
+        objectId: object_id,
+        uniqid: association_admin.uniqid,
+        linkParameters: sonata_admin.field_description.option('link_parameters', {}),
+    } + (association_admin.hasRequest() ? association_admin.request.attributes.get('_route_params', {}) : {})
+      + app.request.query.all|default({}))|raw -}}
+{% endmacro %}
+
+{# the field rendered anew from the posted form, after an object was created in the modal #}
+{% macro retrieve_url(sonata_admin, id, app) %}
+    {%- set root = sonata_admin.admin.root -%}
+    {{- path('sonata_admin_retrieve_form_element', {
+        _sonata_admin: root.baseCodeRoute,
+        elementId: id,
+        subclass: sonata_admin.admin.hasActiveSubClass() ? sonata_admin.admin.getActiveSubclassCode() : null,
+        objectId: root.id(root.subject),
+        uniqid: root.uniqid,
+    } + (root.hasRequest() ? root.request.attributes.get('_route_params', {}) : {})
+      + app.request.query.all|default({}))|raw -}}
+{% endmacro %}
+
+{# a new row of an inline collection #}
+{% macro append_url(sonata_admin, id, app) %}
+    {%- set root = sonata_admin.admin.root -%}
+    {{- path('sonata_admin_append_form_element', {
+        _sonata_admin: root.baseCodeRoute,
+        elementId: id,
+        objectId: root.id(root.subject),
+        uniqid: root.uniqid,
+    } + sonata_admin.field_description.getOption('link_parameters', {})
+      + (root.hasRequest() ? root.request.attributes.get('_route_params', {}) : {})
+      + app.request.query.all|default({}))|raw -}}
+{% endmacro %}
+
+{% macro button(url, action, icon, label, translation_domain, hidden = false, target = null) %}
+    {%- set text = translation_domain is same as(false) ? label : label|trans({}, translation_domain) -%}
+    <a href="{{ url }}" class="btn btn-outline-secondary sonata-ba-action{% if hidden %} d-none{% endif %}" title="{{ text }}"
+       data-action="sonata-association#{{ action }}"{% if target %} data-sonata-association-target="{{ target }}"{% endif %}>
+        <i class="{{ icon }}" aria-hidden="true"></i>
+        {{ text }}
+    </a>
+{%- endmacro %}

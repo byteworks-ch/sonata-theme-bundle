@@ -1,0 +1,24 @@
+{#
+    A login page on the theme's login layout, as a project builds it (the form posts nowhere: the test app has no
+    login).
+#}
+{% extends '@ByteworksSonataTheme/security/layout.html.twig' %}
+
+{% block title %}Sign in{% endblock %}
+
+{% block login_content %}
+    <p class="login-box-msg">Sign in to start your session</p>
+    <form method="post" action="#">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" name="_username" placeholder="Username" autocomplete="username" required>
+            <span class="input-group-text"><i class="fas fa-user" aria-hidden="true"></i></span>
+        </div>
+        <div class="input-group mb-3">
+            <input type="password" class="form-control" name="_password" placeholder="Password" autocomplete="current-password" required>
+            <span class="input-group-text"><i class="fas fa-lock" aria-hidden="true"></i></span>
+        </div>
+        <div class="d-grid">
+            <button type="submit" class="btn btn-primary">Sign in</button>
+        </div>
+    </form>
+{% endblock %}

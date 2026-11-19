@@ -1,0 +1,73 @@
+{#
+    Tab menu of an admin (configureTabMenu) as Bootstrap 5 pills: li.nav-item > a.nav-link (active for the current
+    item), dropdowns with dropdown-item, dividers as hr.dropdown-divider. Sonata sets the root class "nav navbar-nav"
+    in PHP; this template uses its own.
+#}
+{% extends 'knp_menu.html.twig' %}
+
+{% block root %}
+    {%- set listAttributes = item.childrenAttributes|merge({class: 'nav nav-pills adminlte4-tab-menu'}) -%}
+    {{ block('list') -}}
+{% endblock %}
+
+{% block item %}
+    {% import 'knp_menu.html.twig' as macros %}
+    {% if item.displayed %}
+        {%- set attributes = item.attributes %}
+        {%- set is_dropdown = attributes.dropdown|default(false) %}
+        {%- set divider_prepend = attributes.divider_prepend|default(false) %}
+        {%- set divider_append = attributes.divider_append|default(false) %}
+        {%- set attributes = attributes|merge({dropdown: null, divider_prepend: null, divider_append: null}) %}
+        {%- set in_dropdown = item.level > 1 %}
+        {%- set is_current = matcher.isCurrent(item) or matcher.isAncestor(item, options.depth) %}
+
+        {%- if divider_prepend %}{{ block('dividerElement') }}{% endif %}
+
+        {%- set classes = item.attribute('class') is not empty ? [item.attribute('class')] : [] %}
+        {%- set classes = in_dropdown ? classes : classes|merge(['nav-item']) %}
+        {%- if is_dropdown %}{% set classes = classes|merge(['dropdown']) %}{% endif %}
+        {%- set attributes = attributes|merge({class: classes|join(' ')}) %}
+
+        <li{{ macros.attributes(attributes) }}>
+            {%- if is_dropdown %}
+                {{ block('dropdownElement') }}
+                <ul class="dropdown-menu">
+                    {{ block('children') }}
+                </ul>
+            {%- else %}
+                {%- set link_class = (in_dropdown ? 'dropdown-item' : 'nav-link') ~ (is_current ? ' active' : '') %}
+                {%- set linkAttributes = item.linkAttributes|merge({class: ((item.linkAttribute('class') ?? '') ~ ' ' ~ link_class)|trim}) %}
+                {%- if is_current %}{% set linkAttributes = linkAttributes|merge({'aria-current': 'page'}) %}{% endif %}
+                <a href="{{ item.uri is not empty ? item.uri : '#' }}"{{ macros.attributes(linkAttributes) }}>
+                    {% if item.attribute('icon') is not empty %}
+                        {{ item.attribute('icon')|parse_icon }}
+                    {% endif %}
+                    {{ block('label') }}
+                </a>
+            {%- endif %}
+        </li>
+
+        {%- if divider_append %}{{ block('dividerElement') }}{% endif %}
+    {% endif %}
+{% endblock %}
+
+{% block dividerElement %}
+    {% if item.level > 1 %}
+        <li><hr class="dropdown-divider"></li>
+    {% endif %}
+{% endblock %}
+
+{% block dropdownElement %}
+    {% import 'knp_menu.html.twig' as macros %}
+    {%- set attributes = item.linkAttributes|merge({class: ((item.linkAttribute('class') ?? '') ~ ' nav-link dropdown-toggle')|trim, 'data-bs-toggle': 'dropdown', role: 'button', 'aria-expanded': 'false'}) %}
+    <a href="#"{{ macros.attributes(attributes) }}>
+        {% if item.attribute('icon') is not empty %}
+            {{ item.attribute('icon')|parse_icon }}
+        {% endif %}
+        {{ block('label') }}
+    </a>
+{% endblock %}
+
+{% block label %}
+    {{- item.getLabel()|trans(item.getExtra('translation_params', {}), item.getExtra('translation_domain', item.getParent() ? item.getParent().getExtra('translation_domain') : null)) -}}
+{% endblock %}

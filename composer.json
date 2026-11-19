@@ -1,0 +1,50 @@
+{
+    "name": "byteworks/sonata-theme-bundle",
+    "description": "AdminLTE 4 (Bootstrap 5, no jQuery) theme for SonataAdminBundle 4.x",
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "keywords": ["sonata", "admin", "adminlte", "bootstrap", "theme"],
+    "require": {
+        "php": "^8.4",
+        "sonata-project/admin-bundle": "^4.45",
+        "symfony/config": "^7.4 || ^8.1",
+        "symfony/dependency-injection": "^7.4 || ^8.1",
+        "symfony/http-kernel": "^7.4 || ^8.1",
+        "symfony/twig-bundle": "^7.4 || ^8.1",
+        "twig/twig": "^3.15"
+    },
+    "require-dev": {
+        "doctrine/collections": "^2.2",
+        "doctrine/doctrine-bundle": "^2.13 || ^3.0",
+        "doctrine/orm": "^3.3",
+        "phpstan/phpstan": "^2.1",
+        "phpunit/phpunit": "^11.5 || ^12.0",
+        "sonata-project/doctrine-orm-admin-bundle": "^4.21",
+        "sonata-project/entity-audit-bundle": "^1.23",
+        "symfony/acl-bundle": "^2.5",
+        "symfony/browser-kit": "^7.4 || ^8.1",
+        "symfony/css-selector": "^7.4 || ^8.1",
+        "symfony/dotenv": "^7.4 || ^8.1",
+        "symfony/framework-bundle": "^7.4 || ^8.1",
+        "symfony/security-acl": "^3.5",
+        "symfony/security-bundle": "^7.4 || ^8.1",
+        "symfony/validator": "^7.4 || ^8.1",
+        "symfony/yaml": "^7.4 || ^8.1"
+    },
+    "suggest": {
+        "sonata-project/doctrine-orm-admin-bundle": "The theme also covers its templates when it is installed"
+    },
+    "autoload": {
+        "psr-4": {
+            "Byteworks\\SonataThemeBundle\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Byteworks\\SonataThemeBundle\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

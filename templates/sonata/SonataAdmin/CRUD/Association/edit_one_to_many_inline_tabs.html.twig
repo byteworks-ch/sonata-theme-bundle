@@ -1,0 +1,75 @@
+{#
+    Inline collection as tabs: one card per item, a tab for each form group of the associated admin. Tabs with errors
+    are marked and the first of them is shown (no script needed). With the option "sortable", the card header has a
+    handle and the position field is hidden (Stimulus controller "sonata-sortable" on the field).
+#}
+{% set _sortable = sonata_admin.field_description.option('sortable', false) %}
+<div class="sonata-ba-tabs">
+    {% for nested_group_field in form.children %}
+        {% set _item = loop.index %}
+        {% set _error_groups = [] %}
+        {% for form_group in associationAdmin.formgroups %}
+            {% for form_field_name in form_group.fields|filter(form_field_name => nested_group_field.children[form_field_name] is defined) %}
+                {% if not nested_group_field.children[form_field_name].vars.valid %}
+                    {% set _error_groups = _error_groups|merge([loop.parent.loop.index]) %}
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+        {% set _active = _error_groups|first|default(1) %}
+        <div class="card mb-3 adminlte4-inline-item{% if _error_groups is not empty %} border-danger{% endif %}">
+            <div class="card-header d-flex align-items-end gap-2 pb-0">
+                <ul class="nav nav-tabs card-header-tabs flex-grow-1" role="tablist">
+                    {% for form_group in associationAdmin.formgroups %}
+                        {% set _pane = id ~ '_' ~ _item ~ '_' ~ loop.index %}
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link{% if loop.index == _active %} active{% endif %}{% if loop.index in _error_groups %} text-danger{% endif %}"
+                               href="#{{ _pane }}" data-bs-toggle="tab" role="tab" aria-controls="{{ _pane }}"
+                               aria-selected="{{ loop.index == _active ? 'true' : 'false' }}">
+                                {% if loop.index in _error_groups %}<i class="fas fa-exclamation-circle has-errors" aria-hidden="true"></i>{% endif %}
+                                {% if form_group.translation_domain is defined and form_group.translation_domain is same as(false) %}
+                                    {{ form_group.label }}
+                                {% else %}
+                                    {{ form_group.label|trans({}, form_group.translation_domain ?? associationAdmin.translationDomain) }}
+                                {% endif %}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+                {% if _sortable %}
+                    <button type="button" class="btn btn-sm btn-link text-body-secondary mb-1 sonata-ba-sortable-handler"
+                            title="{{ 'sortable.move'|trans({}, 'ByteworksSonataThemeBundle') }}"
+                            data-action="keydown->sonata-sortable#move">
+                        <i class="fas fa-grip-lines" aria-hidden="true"></i>
+                        <span class="visually-hidden">{{ 'sortable.move'|trans({}, 'ByteworksSonataThemeBundle') }}</span>
+                    </button>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="tab-content">
+                    {% for form_group in associationAdmin.formgroups %}
+                        <div class="tab-pane fade{% if loop.index == _active %} show active{% endif %}" id="{{ id }}_{{ _item }}_{{ loop.index }}" role="tabpanel">
+                            <div class="sonata-ba-collapsed-fields">
+                                {% for field_name, form_field_name in form_group.fields|filter(form_field_name => nested_group_field.children[form_field_name] is defined) %}
+                                    {% set nested_field = nested_group_field.children[form_field_name] %}
+                                    <div class="sonata-ba-field-{{ id }}-{{ field_name }}"{% if _sortable and field_name == _sortable %} hidden{% endif %}>
+                                        {{ form_row(nested_field) }}
+                                        {% if associationAdmin.formfielddescriptions[field_name] is defined %}
+                                            {% set dummy = nested_group_field.setrendered %}
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                {% if nested_group_field['_delete'] is defined %}
+                    {{ form_row(nested_group_field['_delete'], {
+                        label: 'action_delete',
+                        translation_domain: 'SonataAdminBundle',
+                        attr: {'data-action': 'change->sonata-association#toggleDeleted'},
+                    }) }}
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</div>

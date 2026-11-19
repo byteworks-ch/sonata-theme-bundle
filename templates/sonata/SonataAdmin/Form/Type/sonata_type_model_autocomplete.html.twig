@@ -1,0 +1,79 @@
+{#
+    Autocomplete field (ModelAutocompleteType): a select that Tom Select fills from the admin's autocomplete action
+    (Stimulus controller "sonata-autocomplete"); the selected ids live in the hidden inputs below, as in Sonata.
+    Sonata's JavaScript blocks (request parameters, item and selection format) need inline scripts. Instead, the
+    controller dispatches "sonata-autocomplete:options" before it starts (detail: the Tom Select options and the
+    request parameters, both changeable); labels with markup need the option "safe_label", as before.
+#}
+{% import '@ByteworksSonataTheme/association.html.twig' as association %}
+{% set _params = {(req_param_name_items_per_page): items_per_page} %}
+{% if sonata_admin.admin %}
+    {% set _params = _params|merge({uniqid: sonata_admin.admin.uniqid, _sonata_admin: sonata_admin.admin.baseCodeRoute}) %}
+{% elseif admin_code %}
+    {% set _params = _params|merge({_sonata_admin: admin_code}) %}
+{% endif %}
+{% if context == 'filter' %}
+    {% set _params = _params|merge({field: full_name|replace({'filter[': '', '][value]': '', '__': '.'}), _context: 'filter'}) %}
+{% else %}
+    {% set _params = _params|merge({field: name}) %}
+{% endif %}
+{% set _params = _params|merge(req_params) %}
+{% set _values = value|filter((val, idx) => idx ~ '' != '_labels') %}
+{% set _association_admin = sonata_admin.field_description and sonata_admin.field_description.hasAssociationAdmin ? sonata_admin.field_description.associationadmin : null %}
+<div class="d-flex align-items-start gap-2">
+<div id="{{ id }}_autocomplete" class="adminlte4-autocomplete flex-grow-1" {{ stimulus_controller('sonata-autocomplete', {
+    url: url ?: path(route.name, route.parameters|default([])),
+    params: _params,
+    searchParam: req_param_name_search,
+    pageParam: req_param_name_page_number,
+    name: full_name ~ (multiple ? '[]' : ''),
+    multiple: multiple,
+    disabled: disabled,
+    placeholder: placeholder,
+    allowClear: not required,
+    minimumInputLength: minimum_input_length,
+    delay: delay == 100 and quiet_millis != 100 ? quiet_millis : delay,
+    cache: cache,
+    safeLabel: safe_label|default(false),
+    itemClass: dropdown_item_css_class,
+    dropdownClass: dropdown_css_class ~ (dropdown_auto_width ? ' adminlte4-dropdown-auto-width' : ''),
+    containerClass: container_css_class,
+    noResults: 'autocomplete.no_results'|trans({}, 'ByteworksSonataThemeBundle'),
+    tooShort: 'autocomplete.too_short'|trans({'%count%': minimum_input_length}, 'ByteworksSonataThemeBundle'),
+    loadingMore: 'autocomplete.loading_more'|trans({}, 'ByteworksSonataThemeBundle'),
+}) }} data-action="sonata-autocomplete:created->sonata-autocomplete#created">
+    <select id="{{ id }}_autocomplete_input" data-sonata-select2="false" {{ stimulus_target('sonata-autocomplete', 'select') }}
+        {%- if disabled %} disabled="disabled"{% endif %}
+        {%- if multiple %} multiple="multiple"{% endif %}
+        {%- for attribute, attribute_value in attr %} {{ attribute }}="{{ attribute_value }}"{% endfor -%}
+    >
+        {%- for idx, val in _values -%}
+            <option value="{{ val }}" selected>{{ value['_labels'][idx] }}</option>
+        {%- endfor -%}
+    </select>
+
+    <div id="{{ id }}_hidden_inputs_wrap" {{ stimulus_target('sonata-autocomplete', 'inputs') }}>
+        {% if multiple -%}
+            {%- for val in _values -%}
+                <input type="hidden" name="{{ full_name }}[]" {%- if disabled %} disabled="disabled"{% endif %} value="{{ val }}">
+            {%- endfor -%}
+        {% else -%}
+            <input type="hidden" name="{{ full_name }}" {%- if disabled %} disabled="disabled"{% endif %} value="{{ value[0]|default('') }}">
+        {% endif -%}
+    </div>
+</div>
+
+{% if _association_admin %}
+    <div id="field_actions_{{ id }}" class="field-actions btn-group btn-group-sm" {{ stimulus_controller('sonata-association', {field: id, mode: 'autocomplete'}) }}>
+        {% if sonata_admin.edit != 'admin' and _association_admin.hasRoute('create') and _association_admin.isGranted('CREATE') and btn_add %}
+            {{ association.button(
+                _association_admin.generateUrl('create', sonata_admin.field_description.getOption('link_parameters', {})),
+                'openAdd',
+                'fas fa-plus-circle',
+                btn_add,
+                btn_translation_domain|default(null) is same as(false) ? false : btn_translation_domain|default(btn_catalogue)
+            ) }}
+        {% endif %}
+    </div>
+{% endif %}
+</div>

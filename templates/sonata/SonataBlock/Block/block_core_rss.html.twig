@@ -1,0 +1,35 @@
+{#
+    RSS feed block of the block bundle: a card (Bootstrap 3's panel and media object become a card and a list).
+#}
+{% extends sonata_block.templates.block_base %}
+
+{% block block %}
+    <div class="card mb-3 {{ settings.class }}">
+        {% if settings.title is not empty %}
+            <div class="card-header">
+                <h4 class="card-title">
+                    {% if settings.icon %}
+                        <i class="{{ settings.icon }}" aria-hidden="true"></i>
+                    {% endif %}
+                    {% if settings.translation_domain %}
+                        {{ settings.title|trans({}, settings.translation_domain) }}
+                    {% else %}
+                        {{ settings.title }}
+                    {% endif %}
+                </h4>
+            </div>
+        {% endif %}
+        <div class="card-body">
+            {% for feed in feeds %}
+                <div class="mb-3">
+                    <h5 class="h6 mb-1">
+                        <a href="{{ feed.link }}" rel="nofollow" title="{{ feed.title }}">{{ feed.title }}</a>
+                    </h5>
+                    {{ feed.description|raw }}
+                </div>
+            {% else %}
+                No feeds available.
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

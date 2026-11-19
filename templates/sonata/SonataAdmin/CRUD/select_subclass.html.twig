@@ -1,0 +1,33 @@
+{#
+    Choice of the subclass before an object of an admin with subclasses is created; AdminLTE 2's "btn-app" buttons
+    become a grid of large buttons.
+#}
+{% extends base_template %}
+
+{% block title %}{{ 'title_select_subclass'|trans({}, 'SonataAdminBundle') }}{% endblock %}
+
+{% block content %}
+    <div class="card card-outline card-success">
+        <div class="card-header">
+            <h3 class="card-title">{{ block('title') }}</h3>
+        </div>
+        <div class="card-body">
+            {% set _subclasses = admin.subclasses|keys %}
+            {% if _subclasses is empty %}
+                <div class="alert alert-info mb-0">{{ 'no_subclass_available'|trans({}, 'SonataAdminBundle') }}</div>
+            {% else %}
+                <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-xl-6 g-3">
+                    {% for subclass in _subclasses %}
+                        <div class="col">
+                            <a href="{{ admin.generateUrl(action, {'subclass': subclass}) }}"
+                               class="btn btn-outline-success w-100 h-100 py-3 d-flex flex-column align-items-center gap-2 adminlte4-subclass">
+                                <i class="fas fa-plus-square fa-2x" aria-hidden="true"></i>
+                                {{ subclass|trans({}, admin.translationdomain|default('SonataAdminBundle')) }}
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

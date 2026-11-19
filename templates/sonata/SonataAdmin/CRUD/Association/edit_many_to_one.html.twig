@@ -1,0 +1,65 @@
+{#
+    Many-to-one association: inline (the fields of the associated admin), as the short description of the selected
+    object with buttons for a list, a new object, editing and removing (edit "list"), or as a select with a button
+    that creates a new object in a modal. All of it through the Stimulus controller "sonata-association".
+#}
+{% import '@ByteworksSonataTheme/association.html.twig' as association %}
+{% if not sonata_admin.field_description.hasassociationadmin %}
+    {{ value|render_relation_element(sonata_admin.field_description) }}
+{% elseif sonata_admin.edit == 'inline' %}
+    {% for field_description in sonata_admin.field_description.associationadmin.formfielddescriptions %}
+        {{ form_row(form[field_description.name]) }}
+    {% endfor %}
+{% else %}
+    {% set association_admin = sonata_admin.field_description.associationadmin %}
+    {% set translation_domain_buttons = btn_translation_domain|default(null) is same as(false) ? false : btn_translation_domain|default(btn_catalogue) %}
+    {% set is_list = sonata_admin.edit == 'list' %}
+    {% if is_list %}
+        {% set _association_admin = sonata_admin.field_description.associationadmin %}
+    {% set values = {
+        field: id,
+        mode: 'list',
+        shortUrl: association.short_url(sonata_admin, '__OBJECT_ID__', app) ~ '',
+        editUrl: _association_admin.hasRoute('edit') and _association_admin.hasAccess('edit') ? _association_admin.generateUrl('edit', {(_association_admin.idParameter): '__OBJECT_ID__'}) : '',
+        placeholder: sonata_admin.field_description.option('placeholder', 'short_object_description_placeholder')|trans({}, 'SonataAdminBundle'),
+        loading: 'loading_information'|trans({}, 'SonataAdminBundle'),
+    } %}
+    {% else %}
+        {% set values = {field: id, mode: 'model', retrieveUrl: association.retrieve_url(sonata_admin, id, app) ~ ''} %}
+    {% endif %}
+    <div id="field_container_{{ id }}" class="field-container" {{ stimulus_controller('sonata-association', values) }}>
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            {% if is_list %}
+                <span id="field_widget_{{ id }}" class="field-short-description" {{ stimulus_target('sonata-association', 'description') }}>
+                    {% if sonata_admin.value and association_admin.id(sonata_admin.value) is not null %}
+                        {{ render(association.short_url(sonata_admin, association_admin.id(sonata_admin.value), app)) }}
+                    {% elseif sonata_admin.field_description.option('placeholder', 'short_object_description_placeholder') %}
+                        <span class="inner-field-short-description text-body-secondary">
+                            {{ sonata_admin.field_description.option('placeholder', 'short_object_description_placeholder')|trans({}, 'SonataAdminBundle') }}
+                        </span>
+                    {% endif %}
+                </span>
+            {% else %}
+                <div id="field_widget_{{ id }}" class="flex-grow-1">
+                    {{ form_widget(form) }}
+                </div>
+            {% endif %}
+            <span id="field_actions_{{ id }}" class="field-actions btn-group btn-group-sm">
+                {% if is_list and association_admin.hasRoute('list') and association_admin.hasAccess('list') and btn_list %}
+                    {{ association.button(association_admin.generateUrl('list', {select: true}|merge(sonata_admin.field_description.getOption('link_parameters', {}))), 'openList', 'fas fa-list', btn_list, translation_domain_buttons) }}
+                {% endif %}
+                {% if sonata_admin.edit != 'admin' and association_admin.hasRoute('create') and association_admin.hasAccess('create') and btn_add %}
+                    {{ association.button(association_admin.generateUrl('create', sonata_admin.field_description.getOption('link_parameters', {})), 'openAdd', 'fas fa-plus-circle', btn_add, translation_domain_buttons) }}
+                {% endif %}
+                {% if is_list and association_admin.hasRoute('delete') and association_admin.hasAccess('delete') and btn_delete %}
+                    {{ association.button('#', 'remove', 'fas fa-minus-circle', btn_delete, translation_domain_buttons) }}
+                {% endif %}
+            </span>
+        </div>
+        {% if is_list %}
+            <span class="d-none">
+                {{ form_widget(form, {attr: {'data-sonata-association-target': 'input', 'data-action': 'change->sonata-association#refresh'}}) }}
+            </span>
+        {% endif %}
+    </div>
+{% endif %}

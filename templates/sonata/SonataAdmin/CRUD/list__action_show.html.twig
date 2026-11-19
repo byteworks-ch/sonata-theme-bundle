@@ -1,0 +1,16 @@
+{#- icon only: no white space next to the icon, so it sits in the middle of the button -#}
+{% if admin.hasAccess('show', object) and admin.hasRoute('show') %}
+    {%- set button_content = sonata_config.getOption('list_action_button_content') -%}
+    {%- set label = 'action_show'|trans({}, 'SonataAdminBundle') -%}
+    <a href="{{ admin.generateObjectUrl('show', object, actions.link_parameters|default([])) }}" class="btn btn-sm btn-outline-secondary view_link" title="{{ label }}">
+        {%- if button_content == 'icon' or button_content == 'all' -%}
+            <i class="fas fa-eye" aria-hidden="true"></i>
+        {%- endif -%}
+        {%- if button_content == 'all' %} {% endif -%}
+        {%- if button_content == 'text' or button_content == 'all' -%}
+            {{ label }}
+        {%- else -%}
+            <span class="visually-hidden">{{ label }}</span>
+        {%- endif -%}
+    </a>
+{%- endif %}

@@ -1,0 +1,49 @@
+{#
+    Error page in the look of the backend, after AdminLTE's error pages: the logo, the status code, a title and a
+    sentence for it. "Back" when the previous page is one of the application; the start page, the target of the logo
+    (a visitor who is not signed in gets to the login: on a 404 Symfony knows no user yet, so the page cannot tell). No
+    details of the error: the page is open to anyone. A project replaces Symfony's error pages with it in
+    templates/bundles/TwigBundle/Exception/error.html.twig, which extends this one; status_code comes from Symfony's
+    error renderer. Codes without texts of their own get those of 500 (server errors) or the general ones (client
+    errors).
+    Blocks: title, meta_tags, stylesheets, javascripts, error_logo, error_content, error_actions, error_footer.
+#}
+{% extends '@ByteworksSonataTheme/standalone_layout.html.twig' %}
+
+{% set _code = status_code|default(500) %}
+{% set _key = 'error.' ~ (_code in [400, 401, 403, 404, 405, 410, 429, 500, 503] ? _code : (_code >= 500 ? 500 : 'client')) %}
+{% set _title = (_key ~ '.title')|trans({}, 'ByteworksSonataThemeBundle') %}
+
+{% block title %}{{ _title }} ({{ _code }}){% endblock %}
+
+{% block body %}
+    <main class="adminlte4-error-page d-flex align-items-center min-vh-100 py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6 text-center">
+                    {% block error_logo %}
+                        <div class="mb-5">{{ include('@ByteworksSonataTheme/standalone_logo.html.twig') }}</div>
+                    {% endblock %}
+                    {% block error_content %}
+                        <div class="display-1 fw-bold lh-1 mb-3 text-primary">{{ _code }}</div>
+                        <h1 class="h3 mb-3">{{ _title }}</h1>
+                        <p class="text-body-secondary mb-4">{{ (_key ~ '.message')|trans({}, 'ByteworksSonataThemeBundle') }}</p>
+                    {% endblock %}
+                    {% block error_actions %}
+                        <div class="d-flex flex-wrap justify-content-center gap-2">
+                            {# only after a page of the application (Stimulus controller "adminlte4-back") #}
+                            <button type="button" class="btn btn-outline-secondary" hidden
+                                    {{ stimulus_controller('adminlte4-back') }} {{ stimulus_action('adminlte4-back', 'back', 'click') }}>
+                                <i class="fas fa-arrow-left me-1" aria-hidden="true"></i> {{ 'error.back'|trans({}, 'ByteworksSonataThemeBundle') }}
+                            </button>
+                            <a href="{{ adminlte4.brand.url ?? path('sonata_admin_dashboard') }}" class="btn btn-primary">
+                                <i class="fas fa-house me-1" aria-hidden="true"></i> {{ 'error.home'|trans({}, 'ByteworksSonataThemeBundle') }}
+                            </a>
+                        </div>
+                    {% endblock %}
+                    {% block error_footer %}{% endblock %}
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock %}

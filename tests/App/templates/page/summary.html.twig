@@ -1,0 +1,11 @@
+{% extends '@SonataAdmin/CRUD/action.html.twig' %}
+
+{% block title %}Summary of "{{ object }}"{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-body">
+            <p>{{ object.links|length }} links, {{ object.related|length }} related posts.</p>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,87 @@
+{
+    "controllers": {
+        "@byteworks/sonata-theme-bundle": {
+            "adminlte4-back": {
+                "enabled": true,
+                "fetch": "eager"
+            },
+            "adminlte4-clamp": {
+                "enabled": true,
+                "fetch": "eager"
+            },
+            "adminlte4-color-mode": {
+                "enabled": true,
+                "fetch": "eager"
+            },
+            "adminlte4-sidebar": {
+                "enabled": true,
+                "fetch": "eager"
+            },
+            "adminlte4-sidebar-menu": {
+                "enabled": true,
+                "fetch": "eager"
+            },
+            "sonata-association": {
+                "enabled": true,
+                "fetch": "eager"
+            },
+            "sonata-autocomplete": {
+                "enabled": true,
+                "fetch": "eager"
+            },
+            "sonata-batch": {
+                "enabled": true,
+                "fetch": "eager"
+            },
+            "sonata-choice-field-mask": {
+                "enabled": true,
+                "fetch": "eager"
+            },
+            "sonata-collection": {
+                "enabled": true,
+                "fetch": "eager"
+            },
+            "sonata-confirm-exit": {
+                "enabled": true,
+                "fetch": "eager"
+            },
+            "sonata-edit": {
+                "enabled": true,
+                "fetch": "eager"
+            },
+            "sonata-filter": {
+                "enabled": true,
+                "fetch": "eager"
+            },
+            "sonata-filter-list": {
+                "enabled": true,
+                "fetch": "eager"
+            },
+            "sonata-inline-edit": {
+                "enabled": true,
+                "fetch": "eager"
+            },
+            "sonata-per-page": {
+                "enabled": true,
+                "fetch": "eager"
+            },
+            "sonata-readmore": {
+                "enabled": true,
+                "fetch": "eager"
+            },
+            "sonata-revision": {
+                "enabled": true,
+                "fetch": "eager"
+            },
+            "sonata-select": {
+                "enabled": true,
+                "fetch": "eager"
+            },
+            "sonata-sortable": {
+                "enabled": true,
+                "fetch": "eager"
+            }
+        }
+    },
+    "entrypoints": []
+}

@@ -1,0 +1,5 @@
+# Static analysis of the bundle's code at the highest level, without a baseline.
+parameters:
+    level: 10
+    paths:
+        - src

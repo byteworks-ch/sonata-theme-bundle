@@ -1,0 +1,63 @@
+{% extends sonata_block.templates.block_base %}
+
+{% block block %}
+    {% set results_count = pager ? pager.countResults() : 0 %}
+    {% set has_results = results_count > 0 %}
+    {% set current_page_results = has_results ? pager.currentPageResults : [] %}
+    {% set visibility_class = 'sonata-search-result-' ~ (has_results ? 'show' : show_empty_boxes) %}
+
+    <div class="col search-box-item {{ visibility_class }}">
+        <div class="card card-outline card-{{ has_results ? 'primary' : 'secondary' }}">
+            <div class="card-header">
+                <h3 class="card-title">
+                    {{ settings.icon|default('')|parse_icon }}
+                    {% if admin.label is not empty %}
+                        {{ admin.label|trans({}, admin.translationdomain) }}
+                    {% endif %}
+                </h3>
+                <div class="card-tools">
+                    {% if has_results %}
+                        <span class="badge text-bg-primary">{{ results_count }}</span>
+                    {% elseif admin.hasRoute('create') and admin.hasAccess('create') %}
+                        <a href="{{ admin.generateUrl('create') }}" class="btn btn-tool" title="{{ 'link_add'|trans({}, 'SonataAdminBundle') }}">
+                            <i class="fas fa-plus" aria-hidden="true"></i>
+                        </a>
+                    {% endif %}
+                    {% if admin.hasRoute('list') and admin.hasAccess('list') %}
+                        <a href="{{ admin.generateUrl('list') }}" class="btn btn-tool" title="{{ 'link_list'|trans({}, 'SonataAdminBundle') }}">
+                            <i class="fas fa-list" aria-hidden="true"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% if filters is not empty %}
+                <div class="px-3 pt-2 d-flex flex-wrap gap-1 matches">
+                    {% for name, filter in filters %}
+                        <a class="badge text-bg-secondary text-decoration-none" href="{{ admin.generateUrl('list', {filter: {(filter.formName): {value: term}}}) }}">
+                            {% if filter.translationDomain is same as(false) %}
+                                {{ filter.label }}
+                            {% else %}
+                                {{ filter.label|trans({}, filter.translationDomain ?? admin.translationDomain) }}
+                            {% endif %}
+                        </a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            {% if has_results %}
+                <div class="list-group list-group-flush sonata-search-result-list mt-2">
+                    {% for result in current_page_results %}
+                        {% if admin.hasRoute(admin_route) and admin.hasAccess(admin_route, result) %}
+                            <a class="list-group-item list-group-item-action" href="{{ admin.generateObjectUrl(admin_route, result) }}">{{ admin.toString(result) }}</a>
+                        {% else %}
+                            <span class="list-group-item">{{ admin.toString(result) }}</span>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="card-body">
+                    <em class="text-body-secondary">{{ 'no_results_found'|trans({}, 'SonataAdminBundle') }}</em>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,25 @@
+{#
+    Base layout of login, two-factor and similar pages outside the admin: AdminLTE's login page with the assets and
+    the color mode of the backend. The card header shows the logo (option brand.logo, the variant for the color mode
+    of the page) or the title; the page goes into the block "login_content".
+    Blocks: title, meta_tags, stylesheets, javascripts, login_logo, login_content, login_footer.
+#}
+{% extends '@ByteworksSonataTheme/standalone_layout.html.twig' %}
+
+{% block body_class %}login-page bg-body-secondary{% endblock %}
+
+{% block body %}
+    <main class="login-box">
+        <div class="card card-outline card-primary">
+            <div class="card-header text-center">
+                {% block login_logo %}
+                    {{ include('@ByteworksSonataTheme/standalone_logo.html.twig') }}
+                {% endblock %}
+            </div>
+            <div class="card-body login-card-body">
+                {% block login_content %}{% endblock %}
+            </div>
+        </div>
+        {% block login_footer %}{% endblock %}
+    </main>
+{% endblock %}

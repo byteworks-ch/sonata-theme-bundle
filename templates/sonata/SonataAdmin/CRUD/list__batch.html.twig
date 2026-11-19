@@ -1,0 +1,5 @@
+{% extends get_admin_template('base_list_field', admin.code) %}
+
+{% block field %}
+    <input type="checkbox" class="form-check-input" name="idx[]" value="{{ admin.id(object) }}" aria-label="{{ admin.toString(object) }}">
+{% endblock %}
